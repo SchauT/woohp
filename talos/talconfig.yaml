@@ -2,17 +2,15 @@
 clusterName: woohp
 talosVersion: v1.12.4
 kubernetesVersion: v1.35.0
-endpoint: https://192.168.1.101:6443
+endpoint: https://192.168.1.100:6443
 domain: woohp.local
 allowSchedulingOnMasters: true
+additionalMachineCertSans:
+  - 192.168.1.100
 nodes:
   - hostname: sam
-    controlPlane: true
     ipAddress: 192.168.1.101
-    nameservers:
-      - 192.168.1.254
-      - 1.1.1.1
-      - 8.8.8.8
+    controlPlane: true
     installDisk: /dev/nvme0n1
     patches:
       - |-
@@ -26,6 +24,8 @@ nodes:
                 routes:
                   - gateway: 192.168.1.254
                     network: 0.0.0.0/0
+                vip:
+                  ip: 192.168.1.100
   - hostname: clover
     ipAddress: 192.168.1.102
     controlPlane: true
@@ -42,9 +42,11 @@ nodes:
                 routes:
                   - gateway: 192.168.1.254
                     network: 0.0.0.0/0
+                vip:
+                  ip: 192.168.1.100
   - hostname: alex
     ipAddress: 192.168.1.103
-    controlPlane: false
+    controlPlane: true
     installDisk: /dev/nvme0n1
     patches:
       - |-
