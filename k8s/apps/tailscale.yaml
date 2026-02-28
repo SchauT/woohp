@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: 'https://github.com/SchauT/woohp.git'
     targetRevision: HEAD
-    path: k8s/ccharts/tailscale
+    path: k8s/charts/tailscale
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: tailscale
