@@ -2,4 +2,4 @@ tailscale-operator:
   oauth:
     existingSecret: "operator-oauth"
   apiServerProxyConfig:
-    mode: "noauth"
+    mode: "true"

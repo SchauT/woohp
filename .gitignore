@@ -1,3 +1,8 @@
 .envrc
 woohp-kubeconfig
+
+**/charts/*.tgz
+**/charts/*/charts/
+Chart.lock
+
 *.bak
