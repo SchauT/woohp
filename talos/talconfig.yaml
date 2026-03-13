@@ -1,6 +1,6 @@
 ---
 clusterName: woohp
-talosVersion: v1.12.4
+talosVersion: v1.12.5
 kubernetesVersion: v1.35.0
 endpoint: https://192.168.1.100:6443
 domain: woohp.local
@@ -26,6 +26,22 @@ nodes:
                     network: 0.0.0.0/0
                 vip:
                   ip: 192.168.1.100
+          kubelet:
+            extraMounts:
+              - destination: /var/lib/longhorn
+                type: bind
+                source: /var/lib/longhorn
+                options:
+                  - bind
+                  - rshared
+                  - rw
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+
   - hostname: clover
     ipAddress: 192.168.1.102
     controlPlane: true
@@ -44,6 +60,22 @@ nodes:
                     network: 0.0.0.0/0
                 vip:
                   ip: 192.168.1.100
+          kubelet:
+            extraMounts:
+              - destination: /var/lib/longhorn
+                type: bind
+                source: /var/lib/longhorn
+                options:
+                  - bind
+                  - rshared
+                  - rw
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+
   - hostname: alex
     ipAddress: 192.168.1.103
     controlPlane: true
@@ -60,3 +92,18 @@ nodes:
                 routes:
                   - gateway: 192.168.1.254
                     network: 0.0.0.0/0
+          kubelet:
+            extraMounts:
+              - destination: /var/lib/longhorn
+                type: bind
+                source: /var/lib/longhorn
+                options:
+                  - bind
+                  - rshared
+                  - rw
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
