@@ -1,3 +1,10 @@
 argo-cd:
   dex:
     enabled: false
+
+  server:
+    ingress:
+      enabled: true
+      ingressClassName: "tailscale"
+      hostname: "argo"
+      tls: true
