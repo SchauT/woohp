@@ -5,5 +5,7 @@ woohp-kubeconfig
 **/charts/*.tgz
 **/charts/*/charts/
 Chart.lock
+**/template.yaml
+**/template.yml
 
 *.bak
