@@ -5,8 +5,11 @@ metadata:
   namespace: longhorn-system
 spec:
   ingressClassName: tailscale
+  tls:
+    - hosts:
+        - longhorn
   rules:
-    - host: longhorn.raccoon-pence.ts.net
+    - host: longhorn
       http:
         paths:
           - path: /
