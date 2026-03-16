@@ -1,0 +1,313 @@
+# Server configuration
+server:
+  port: 8080
+
+# Theme configuration
+theme:
+  background-color: 225 14 15
+  primary-color: 265 89 79
+  contrast-multiplier: 1.2
+  positive-color: 96 44 68
+  negative-color: 359 68 71
+
+# Branding
+branding:
+  app-name: "Le Woohp"
+  logo-text: "W"
+  custom-footer: |
+    <p>Powered by a random dumb dude</p>
+
+# Pages configuration
+pages:
+  - name: Home
+    columns:
+      - size: small
+        widgets:
+          - type: clock
+            hour-format: 24h
+
+          - type: calendar
+
+          - type: weather
+            location: Paris, France
+            units: metric
+            hour-format: 24h
+
+          - type: twitch-channels
+            channels:
+              - Alderiate
+              - Splinter
+              - Kamet0
+              - otplol_
+              - Ricadam_lol
+              - TraYtoNlol
+              - pandorelol
+              - Chap_GG
+
+      - size: full
+        widgets:
+          - $include: community-widgets/random-duck.yml
+
+      - size: small
+        widgets:
+          - $include: community-widgets/qbittorrent-stats.yml
+          - type: bookmarks
+            groups:
+              - title: Entertainment
+                color: 10 70 50
+                links:
+                  - title: Netflix
+                    url: https://www.netflix.com/
+                    icon: si:netflix
+                  - title: Disney+
+                    url: https://www.disneyplus.com/
+                    icon: si:disney
+                  - title: YouTube
+                    url: https://www.youtube.com/
+                    icon: si:youtube
+                  - title: Prime Video
+                    url: https://www.primevideo.com/
+                    icon: si:amazon
+              - title: Quick Links
+                links:
+                  - title: GitHub
+                    url: https://github.com
+                    icon: si:github
+                  - title: Crowdsec
+                    url: https://app.crowdsec.net/security-engines
+                    icon: si:crowdsec
+                  - title: Cloudflare
+                    url: https://dash.cloudflare.com
+                    icon: si:cloudflare
+                  - title: Docker Hub
+                    url: https://hub.docker.com
+                    icon: si:docker
+                  - title: ProtonMail
+                    url: https://mail.protonmail.com
+                    icon: si:protonmail
+
+          - type: search
+            search-engine: duckduckgo
+            bangs:
+              - title: YouTube
+                shortcut: "!yt"
+                url: https://www.youtube.com/results\?search_query\=\{QUERY\}
+              - title: GitHub
+                shortcut: "!gh"
+                url: https://github.com/search\?q\=\{QUERY\}
+              - title: Docker Hub
+                shortcut: "!dh"
+                url: https://hub.docker.com/search\?q\=\{QUERY\}
+
+          - type: to-do
+
+  - name: News & Feeds
+    columns:
+      - size: full
+        widgets:
+          - type: reddit
+            subreddit: selfhosted
+            title: r/selfhosted
+            style: vertical-list
+            limit: 10
+            collapse-after: 5
+
+          - type: rss
+            title: Tech News & Business
+            style: horizontal-cards
+            feeds:
+              # Tech Business & Industry
+              - url: https://feeds.feedburner.com/techcrunch
+                title: TechCrunch
+              - url: https://feeds.arstechnica.com/arstechnica/index
+                title: Ars Technica
+              - url: https://www.theverge.com/rss/index.xml
+                title: The Verge
+              - url: https://feeds.feedburner.com/venturebeat/SZYF
+                title: VentureBeat
+              - url: https://www.infoworld.com/index.rss
+                title: InfoWorld
+              # Cloud & DevOps
+              - url: https://aws.amazon.com/blogs/aws/feed/
+                title: AWS Blog
+              - url: https://feeds.feedburner.com/oreilly/ideas
+                title: O'Reilly Ideas
+              - url: https://kubernetes.io/feed.xml
+                title: Kubernetes Blog
+            limit: 25
+            collapse-after: 8
+
+          - type: rss
+            title: DevOps & SRE
+            style: vertical-list
+            feeds:
+              # SRE & Infrastructure
+              - url: https://engineering.fb.com/feed/
+                title: Meta Engineering
+              - url: https://medium.com/feed/netflix-techblog
+                title: Netflix Tech Blog
+              - url: https://blog.cloudflare.com/rss/
+                title: Cloudflare Blog
+              - url: https://github.blog/engineering.atom
+                title: GitHub Engineering
+              - url: https://www.redhat.com/sysadmin/rss.xml
+                title: Red Hat SysAdmin
+              - url: https://stackshare.io/feed
+                title: StackShare
+            limit: 20
+            collapse-after: 6
+
+          - type: rss
+            title: Security & Open Source
+            style: vertical-list
+            feeds:
+              # Security
+              - url: https://krebsonsecurity.com/feed/
+                title: Krebs on Security
+              - url: https://blog.malwarebytes.com/feed/
+                title: Malwarebytes
+              - url: https://www.bleepingcomputer.com/feed/
+                title: BleepingComputer
+              # Open Source
+              - url: https://opensource.com/feed
+                title: OpenSource.com
+              - url: https://lwn.net/headlines/rss
+                title: Linux Weekly News
+              - url: https://www.phoronix.com/rss.php
+                title: Phoronix
+            limit: 15
+            collapse-after: 5
+
+          - type: hacker-news
+            title: Hacker News
+            limit: 15
+            collapse-after: 5
+
+          - type: group
+            widgets:
+              - type: reddit
+                subreddit: gamingnews
+                show-thumbnails: true
+                collapse-after: 6
+              - type: reddit
+                subreddit: games
+              - type: reddit
+                subreddit: pcgaming
+                show-thumbnails: true
+
+  - name: Markets
+    columns:
+      - size: small
+        widgets:
+          - type: markets
+            title: Indices
+            markets:
+              - symbol: SPY
+                name: S&P 500
+              - symbol: DX-Y.NYB
+                name: Dollar Index
+
+          - type: markets
+            title: Crypto
+            markets:
+              - symbol: BTC-USD
+                name: Bitcoin
+              - symbol: ETH-USD
+                name: Ethereum
+
+          - type: markets
+            title: Stocks
+            sort-by: absolute-change
+            markets:
+              - symbol: NVDA
+                name: NVIDIA
+              - symbol: AAPL
+                name: Apple
+              - symbol: MSFT
+                name: Microsoft
+              - symbol: GOOGL
+                name: Google
+              - symbol: AMD
+                name: AMD
+              - symbol: RDDT
+                name: Reddit
+              - symbol: AMZN
+                name: Amazon
+              - symbol: TSLA
+                name: Tesla
+              - symbol: INTC
+                name: Intel
+              - symbol: META
+                name: Meta
+
+      - size: full
+        widgets:
+          - type: rss
+            title: News
+            style: horizontal-cards
+            feeds:
+              - url: https://feeds.bloomberg.com/markets/news.rss
+                title: Bloomberg
+              - url: https://moxie.foxbusiness.com/google-publisher/markets.xml
+                title: Fox Business
+              - url: https://moxie.foxbusiness.com/google-publisher/technology.xml
+                title: Fox Business
+
+          - type: group
+            widgets:
+              - type: reddit
+                show-thumbnails: true
+                subreddit: technology
+              - type: reddit
+                show-thumbnails: true
+                subreddit: wallstreetbets
+
+          - type: videos
+            style: grid-cards
+            collapse-after-rows: 3
+            channels:
+              - UCvSXMi2LebwJEM1s4bz5IBA # New Money
+              - UCV6KDgJskWaEckne5aPA0aQ # Graham Stephan
+              - UCAzhpt9DmG6PnHXjmJTvRGQ # Federal Reserve
+
+      - size: small
+        widgets:
+          - type: rss
+            title: News
+            limit: 30
+            collapse-after: 13
+            feeds:
+              - url: https://www.ft.com/technology?format=rss
+                title: Financial Times
+              - url: https://feeds.a.dj.com/rss/RSSMarketsMain.xml
+                title: Wall Street Journal
+
+  - name: System
+    columns:
+      - size: full
+        widgets:
+          - type: server-stats
+            title: Server Statistics
+            servers:
+              - type: local
+                name: AuschHome Server
+                hide-mountpoints-by-default: true
+                mountpoints:
+                  "/":
+                    hide: false
+                  "/var/auschome":
+                    hide: false
+
+      - size: small
+        widgets:
+          - type: releases
+            title: Latest Releases
+            repositories:
+              - glanceapp/glance
+              - jellyfin/jellyfin
+              - sonarr/sonarr
+              - radarr/radarr
+              - prowlarr/prowlarr
+              - qbittorrent/qbittorrent
+            limit: 8
+            collapse-after: 5

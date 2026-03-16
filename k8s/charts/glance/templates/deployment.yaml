@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glance
+  namespace: default
+spec:
+  replicas: {{ .Values.glance.replicas }}
+  selector:
+    matchLabels:
+      app: glance
+  template:
+    metadata:
+      labels:
+        app: glance
+    spec:
+      containers:
+      - name: glance
+        image: {{ .Values.glance.image }}
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          requests:
+            cpu: {{ .Values.glance.resources.requests.cpu }}
+            memory: {{ .Values.glance.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.glance.resources.limits.cpu }}
+            memory: {{ .Values.glance.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+      volumes:
+      - name: config
+        configMap:
+          name: glance-config
+          defaultMode: 0644

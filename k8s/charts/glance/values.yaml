@@ -1,0 +1,12 @@
+glance:
+  image: glanceapp/glance:0.8.4
+  replicas: 1
+  port: 8080
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi

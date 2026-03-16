@@ -1,0 +1,7 @@
+ - type: custom-api
+   height: 200px
+   title: Random Duck
+   cache: 2m
+   url: https://random-d.uk/api/v2/random
+   template: |
+     <img src="{{ .JSON.String "url" }}"></img>
