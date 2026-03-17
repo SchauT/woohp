@@ -13,9 +13,9 @@ theme:
 # Branding
 branding:
   app-name: "Le Woohp"
-  logo-text: "W"
+  logo-text: "WOOHP"
   custom-footer: |
-    <p>Powered by a random dumb dude</p>
+    <p>KWAK KWAK</p>
 
 # Pages configuration
 pages:
@@ -50,6 +50,19 @@ pages:
 
       - size: small
         widgets:
+          - type: search
+            search-engine: duckduckgo
+            bangs:
+              - title: YouTube
+                shortcut: "!yt"
+                url: https://www.youtube.com/results\?search_query\=\{QUERY\}
+              - title: GitHub
+                shortcut: "!gh"
+                url: https://github.com/search\?q\=\{QUERY\}
+              - title: Docker Hub
+                shortcut: "!dh"
+                url: https://hub.docker.com/search\?q\=\{QUERY\}
+
           - type: bookmarks
             groups:
               - title: Entertainment
@@ -70,33 +83,17 @@ pages:
               - title: Quick Links
                 links:
                   - title: GitHub
-                    url: https://github.com
+                    url: https://github.com/SchauT/woohp
                     icon: si:github
-                  - title: Crowdsec
-                    url: https://app.crowdsec.net/security-engines
-                    icon: si:crowdsec
                   - title: Cloudflare
                     url: https://dash.cloudflare.com
                     icon: si:cloudflare
                   - title: Docker Hub
                     url: https://hub.docker.com
                     icon: si:docker
-                  - title: ProtonMail
-                    url: https://mail.protonmail.com
-                    icon: si:protonmail
-
-          - type: search
-            search-engine: duckduckgo
-            bangs:
-              - title: YouTube
-                shortcut: "!yt"
-                url: https://www.youtube.com/results\?search_query\=\{QUERY\}
-              - title: GitHub
-                shortcut: "!gh"
-                url: https://github.com/search\?q\=\{QUERY\}
-              - title: Docker Hub
-                shortcut: "!dh"
-                url: https://hub.docker.com/search\?q\=\{QUERY\}
+                  - title: Proton
+                    url: https://account.protonvpn.com/dashboardV2
+                    icon: si:proton
 
           - type: to-do
 
@@ -104,95 +101,7 @@ pages:
     columns:
       - size: full
         widgets:
-          - type: reddit
-            subreddit: selfhosted
-            title: r/selfhosted
-            style: vertical-list
-            limit: 10
-            collapse-after: 5
-
-          - type: rss
-            title: Tech News & Business
-            style: horizontal-cards
-            feeds:
-              # Tech Business & Industry
-              - url: https://feeds.feedburner.com/techcrunch
-                title: TechCrunch
-              - url: https://feeds.arstechnica.com/arstechnica/index
-                title: Ars Technica
-              - url: https://www.theverge.com/rss/index.xml
-                title: The Verge
-              - url: https://feeds.feedburner.com/venturebeat/SZYF
-                title: VentureBeat
-              - url: https://www.infoworld.com/index.rss
-                title: InfoWorld
-              # Cloud & DevOps
-              - url: https://aws.amazon.com/blogs/aws/feed/
-                title: AWS Blog
-              - url: https://feeds.feedburner.com/oreilly/ideas
-                title: O'Reilly Ideas
-              - url: https://kubernetes.io/feed.xml
-                title: Kubernetes Blog
-            limit: 25
-            collapse-after: 8
-
-          - type: rss
-            title: DevOps & SRE
-            style: vertical-list
-            feeds:
-              # SRE & Infrastructure
-              - url: https://engineering.fb.com/feed/
-                title: Meta Engineering
-              - url: https://medium.com/feed/netflix-techblog
-                title: Netflix Tech Blog
-              - url: https://blog.cloudflare.com/rss/
-                title: Cloudflare Blog
-              - url: https://github.blog/engineering.atom
-                title: GitHub Engineering
-              - url: https://www.redhat.com/sysadmin/rss.xml
-                title: Red Hat SysAdmin
-              - url: https://stackshare.io/feed
-                title: StackShare
-            limit: 20
-            collapse-after: 6
-
-          - type: rss
-            title: Security & Open Source
-            style: vertical-list
-            feeds:
-              # Security
-              - url: https://krebsonsecurity.com/feed/
-                title: Krebs on Security
-              - url: https://blog.malwarebytes.com/feed/
-                title: Malwarebytes
-              - url: https://www.bleepingcomputer.com/feed/
-                title: BleepingComputer
-              # Open Source
-              - url: https://opensource.com/feed
-                title: OpenSource.com
-              - url: https://lwn.net/headlines/rss
-                title: Linux Weekly News
-              - url: https://www.phoronix.com/rss.php
-                title: Phoronix
-            limit: 15
-            collapse-after: 5
-
-          - type: hacker-news
-            title: Hacker News
-            limit: 15
-            collapse-after: 5
-
-          - type: group
-            widgets:
-              - type: reddit
-                subreddit: gamingnews
-                show-thumbnails: true
-                collapse-after: 6
-              - type: reddit
-                subreddit: games
-              - type: reddit
-                subreddit: pcgaming
-                show-thumbnails: true
+          - $include: plugins/veille-tech.yml
 
   - name: System
     columns:

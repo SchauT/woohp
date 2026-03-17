@@ -8,7 +8,6 @@ spec:
   tls:
   - hosts:
     - glance
-    secretName: glance-tls
   rules:
   - host: glance
     http:
