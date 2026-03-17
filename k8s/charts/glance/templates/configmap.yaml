@@ -4,9 +4,4 @@ metadata:
   name: glance-config
   namespace: default
 data:
-  {{- $files := .Files.Glob "config/**" }}
-  {{- range $path, $_ := $files }}
-  {{- $relPath := trimPrefix "config/" $path }}
-  {{ $relPath }}: |
-{{ $.Files.Get $path | indent 4 }}
-  {{- end }}
+{{ (.Files.Glob "config/**").AsConfig | indent 2 }}
