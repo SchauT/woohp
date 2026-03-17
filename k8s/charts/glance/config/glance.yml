@@ -101,7 +101,7 @@ pages:
     columns:
       - size: full
         widgets:
-          - $include: plugins/veille-tech.yml
+          - $include: veille-tech.yml
 
   - name: System
     columns:
