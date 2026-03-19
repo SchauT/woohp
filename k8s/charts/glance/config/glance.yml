@@ -48,7 +48,7 @@ pages:
         widgets:
           - type: bookmarks
             groups:
-              - title: "Services"
+              - title: Services
                 color: 265 70 60
                 links:
                   - title: ArgoCD
