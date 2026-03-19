@@ -46,17 +46,16 @@ pages:
 
       - size: full
         widgets:
-          - type: bookmarks
-            groups:
-              - title: Services
-                color: 265 70 60
-                links:
-                  - title: ArgoCD
-                    url: https://argo.raccoon-pence.ts.net
-                    icon: si:argo
-                  - title: Longhorn
-                    url: https://longhorn.raccoon-pence.ts.net/#/dashboard
-                    icon: si:longhorn
+          - type: monitor
+            cache: 1m
+            title: Services
+            sites:
+              - title: ArgoCD
+                url: https://argo.raccoon-pence.ts.net
+                icon: si:argo
+              - title: Longhorn
+                url: https://longhorn.raccoon-pence.ts.net/#/dashboard
+                icon: si:longhorn
 
           - $include: random-duck.yml
 
@@ -263,7 +262,7 @@ pages:
               - sonarr/sonarr
               - radarr/radarr
               - prowlarr/prowlarr
-              - qbittorrent/qbittorrent
+              - qbittorrent/qBittorrent
               - argoproj/argo-cd
               - longhorn/longhorn
             limit: 10
