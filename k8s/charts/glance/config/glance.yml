@@ -51,10 +51,10 @@ pages:
             title: Services
             sites:
               - title: ArgoCD
-                url: https://argo.raccoon-pence.ts.net
+                url: http://argocd-server.argocd.svc.woohp.local
                 icon: si:argo
               - title: Longhorn
-                url: https://longhorn.raccoon-pence.ts.net/#/dashboard
+                url: http://longhorn-frontend.longhorn-system.svc.woohp.local
                 icon: si:longhorn
 
           - $include: random-duck.yml
