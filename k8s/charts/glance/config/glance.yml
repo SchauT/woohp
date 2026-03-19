@@ -120,28 +120,38 @@ pages:
           # Presse française
           - type: rss
             title: 🇫🇷 Actualités France
-            urls:
-              - https://www.lemonde.fr/rss/une.xml
-              - https://www.liberation.fr/arc/outboundfeeds/rss-all/collection/accueil-une/?outputType=xml
-              - https://www.mediapart.fr/articles/feed
+            style: vertical-list
+            feeds:
+              - url: https://www.lemonde.fr/rss/une.xml
+                title: Le Monde
+              - url: https://www.liberation.fr/arc/outboundfeeds/rss-all/collection/accueil-une/?outputType=xml
+                title: Libération
+              - url: https://www.mediapart.fr/articles/feed
+                title: MédiaPart
             limit: 10
             collapse-after: 5
 
           # Presse internationale anglophone
           - type: rss
             title: 🌍 Presse mondiale
-            urls:
-              - https://feeds.bbci.co.uk/news/world/rss.xml
-              - https://www.theguardian.com/world/rss
-              - https://news.google.com/rss/search?q=site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen
+            style: vertical-list
+            feeds:
+              - url: https://feeds.bbci.co.uk/news/world/rss.xml
+                title: BBC World
+              - url: https://www.theguardian.com/world/rss
+                title: The Guardian World
+              - url: https://news.google.com/rss/search?q=site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen
+                title: Reuters
             limit: 8
             collapse-after: 5
 
           # Scène pirate / torrent
           - type: rss
             title: 🏴‍☠️ Pirate & Torrent
-            urls:
-              - https://feeds.feedburner.com/tf          # TorrentFreak
+            style: vertical-list
+            feeds:
+              - url: https://feeds.feedburner.com/tf
+                title: TorrentFreak
             limit: 8
             collapse-after: 5
 
@@ -183,41 +193,58 @@ pages:
           # 2. SRE & CLOUD NATIVE
           - type: rss
             title: ☁️ SRE & Cloud Native
-            urls:
-              - https://kubernetes.io/feed.xml                   # Blog officiel Kubernetes
-              - https://blog.cloudflare.com/rss/                 # Cloudflare blog (excellent)
-              - https://www.cncf.io/blog/feed/                   # CNCF
-              - https://sreweekly.com/feed/                      # SRE Weekly newsletter
-              - https://thenewstack.io/feed/                     # The New Stack — platform eng.
+            style: horizontal-cards-2
+            feeds:
+              - url: https://kubernetes.io/feed.xml
+                title: Kubernetes
+              - url: https://blog.cloudflare.com/rss/
+                title: Cloudflare
+              - url: https://www.cncf.io/blog/feed/
+                title: CNCF
+              - url: https://sreweekly.com/feed/
+                title: SRE Weekly
+              - url: https://thenewstack.io/feed/
+                title: The New Stack
             limit: 12
             collapse-after: 6
 
           # 3. DEVOPS & PLATFORM ENGINEERING
           - type: rss
             title: 🛠️ DevOps & Platform Engineering
-            urls:
-              - https://feed.infoq.com/Devops/                    # InfoQ DevOps
-              - https://devops.com/feed/                          # DevOps.com
-              - https://martinfowler.com/feed.atom                # Martin Fowler — architecture
+            style: horizontal-cards-2
+            feeds:
+              - url: https://feed.infoq.com/Devops/
+                title: InfoQ DevOps
+              - url: https://devops.com/feed/
+                title: DevOps.com
+              - url: https://martinfowler.com/feed.atom
+                title: Martin Fowler
             limit: 10
             collapse-after: 5
 
           # 4. CYBERSÉCURITÉ
           - type: rss
             title: 🔐 Cybersécurité
-            urls:
-              - https://krebsonsecurity.com/feed/                # Krebs on Security
-              - https://www.schneier.com/blog/atom.xml           # Bruce Schneier
-              - https://feeds.feedburner.com/TheHackersNews      # The Hacker News
+            style: horizontal-cards-2
+            feeds:
+              - url: https://krebsonsecurity.com/feed/
+                title: Krebs on Security
+              - url: https://www.schneier.com/blog/atom.xml
+                title: Bruce Schneier
+              - url: https://feeds.feedburner.com/TheHackersNews
+                title: The Hacker News
             limit: 10
             collapse-after: 5
 
           # 5. OPEN SOURCE & DEV — bonus signal/bruit
           - type: rss
             title: 🤖 Open Source & Dev
-            urls:
-              - https://lobste.rs/rss                            # Lobste.rs (HN mais dev/ops)
-              - https://tldr.tech/api/rss/tech                   # TLDR Tech daily digest
+            style: horizontal-cards-2
+            feeds:
+              - url: https://lobste.rs/rss
+                title: Lobste.rs
+              - url: https://tldr.tech/api/rss/tech
+                title: TLDR Tech
             limit: 10
             collapse-after: 5
 
