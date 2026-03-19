@@ -46,6 +46,18 @@ pages:
 
       - size: full
         widgets:
+          - type: bookmarks
+            groups:
+              - title: "Services"
+                color: 265 70 60
+                links:
+                  - title: ArgoCD
+                    url: https://argo.raccoon-pence.ts.net
+                    icon: si:argo
+                  - title: Longhorn
+                    url: https://longhorn.raccoon-pence.ts.net/#/dashboard
+                    icon: si:longhorn
+
           - $include: random-duck.yml
 
       - size: small
@@ -80,6 +92,7 @@ pages:
                   - title: Prime Video
                     url: https://www.primevideo.com/
                     icon: si:amazon
+
               - title: Quick Links
                 links:
                   - title: GitHub
@@ -99,54 +112,150 @@ pages:
 
   - name: News & Feeds
     columns:
+      # -------------------------------------------------------
+      # COLONNE GAUCHE — Actualités & fil pirate
+      # -------------------------------------------------------
       - size: small
         widgets:
-          # 1. NEWS GLOBALES
+          # Presse française
           - type: rss
-            title: 🇫🇷 Actualités
+            title: 🇫🇷 Actualités France
             urls:
               - https://www.lemonde.fr/rss/une.xml
+              - https://www.liberation.fr/arc/outboundfeeds/rss-all/collection/accueil-une/?outputType=xml
               - https://www.mediapart.fr/articles/feed
             limit: 10
             collapse-after: 5
 
-          # 3. PIRATE SCENE
+          # Presse internationale anglophone
           - type: rss
-            title: 🏴‍☠️ TorrentFreak
-            url: https://feeds.feedburner.com/tf
+            title: 🌍 Presse mondiale
+            urls:
+              - https://feeds.bbci.co.uk/news/world/rss.xml
+              - https://www.theguardian.com/world/rss
+              - https://news.google.com/rss/search?q=site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen
             limit: 8
+            collapse-after: 5
 
+          # Scène pirate / torrent
+          - type: rss
+            title: 🏴‍☠️ Pirate & Torrent
+            urls:
+              - https://feeds.feedburner.com/tf          # TorrentFreak
+            limit: 8
+            collapse-after: 5
+
+          # Hacker News — cybersécurité + tech générale
+          - type: hacker-news
+            title: 📡 Hacker News
+            limit: 10
+            collapse-after: 5
+
+      # -------------------------------------------------------
+      # COLONNE CENTRALE — Veille technique (homelab, SRE, sécu)
+      # -------------------------------------------------------
       - size: full
         widgets:
-          # 2. GROUPE REDDIT (Système d'onglets)
+          # 1. HOMELAB / SELFHOSTING — groupe d'onglets Reddit
           - type: group
             widgets:
               - type: reddit
                 subreddit: selfhosted
-                title: 🏠 Self-Hosted
+                title: 🏠 r/selfhosted
                 style: vertical-list
                 limit: 10
               - type: reddit
                 subreddit: homelab
-                title: 🛠️ Homelab
+                title: 🛠️ r/homelab
+                style: vertical-list
+                limit: 10
+              - type: reddit
+                subreddit: DataHoarder
+                title: 💾 r/DataHoarder
+                style: vertical-list
+                limit: 10
+              - type: reddit
+                subreddit: selfhosting
+                title: 🐳 r/selfhosting
                 style: vertical-list
                 limit: 10
 
-          # 4. VEILLE SRE & INFRA
+          # 2. SRE & CLOUD NATIVE
           - type: rss
             title: ☁️ SRE & Cloud Native
             urls:
-              - https://kubernetes.io/feed.xml
-              - https://blog.cloudflare.com/rss/
-              - https://www.cncf.io/blog/feed/
+              - https://kubernetes.io/feed.xml                   # Blog officiel Kubernetes
+              - https://blog.cloudflare.com/rss/                 # Cloudflare blog (excellent)
+              - https://www.cncf.io/blog/feed/                   # CNCF
+              - https://sreweekly.com/feed/                      # SRE Weekly newsletter
+              - https://thenewstack.io/feed/                     # The New Stack — platform eng.
+            limit: 12
+            collapse-after: 6
+
+          # 3. DEVOPS & PLATFORM ENGINEERING
+          - type: rss
+            title: 🛠️ DevOps & Platform Engineering
+            urls:
+              - https://feed.infoq.com/Devops/                    # InfoQ DevOps
+              - https://devops.com/feed/                          # DevOps.com
+              - https://martinfowler.com/feed.atom                # Martin Fowler — architecture
             limit: 10
             collapse-after: 5
 
-          # 5. CYBERSECU
-          - type: hacker-news
-            title: 🛡️ Hacker News
+          # 4. CYBERSÉCURITÉ
+          - type: rss
+            title: 🔐 Cybersécurité
+            urls:
+              - https://krebsonsecurity.com/feed/                # Krebs on Security
+              - https://www.schneier.com/blog/atom.xml           # Bruce Schneier
+              - https://feeds.feedburner.com/TheHackersNews      # The Hacker News
             limit: 10
+            collapse-after: 5
 
+          # 5. OPEN SOURCE & DEV — bonus signal/bruit
+          - type: rss
+            title: 🤖 Open Source & Dev
+            urls:
+              - https://lobste.rs/rss                            # Lobste.rs (HN mais dev/ops)
+              - https://tldr.tech/api/rss/tech                   # TLDR Tech daily digest
+            limit: 10
+            collapse-after: 5
+
+      # -------------------------------------------------------
+      # COLONNE DROITE — Sources complémentaires & releases
+      # -------------------------------------------------------
+      - size: small
+        widgets:
+          # Releases du stack homelab
+          - type: releases
+            title: 🚀 Releases homelab
+            repositories:
+              - glanceapp/glance
+              - jellyfin/jellyfin
+              - seerr-team/seerr
+              - sonarr/sonarr
+              - radarr/radarr
+              - prowlarr/prowlarr
+              - qbittorrent/qbittorrent
+              - argoproj/argo-cd
+              - longhorn/longhorn
+            limit: 10
+            collapse-after: 6
+
+          # Reddit France — actu communautaire FR
+          - type: reddit
+            subreddit: france
+            title: 🐓 r/france
+            style: vertical-list
+            limit: 8
+            collapse-after: 5
+
+          # CERT-FR — alertes de sécurité officielles
+          - type: rss
+            title: 🚨 CERT-FR Alertes
+            url: https://www.cert.ssi.gouv.fr/feed/
+            limit: 6
+            collapse-after: 4
 
   - name: System
     columns:
@@ -163,17 +272,3 @@ pages:
                     hide: false
                   "/var/auschome":
                     hide: false
-
-      - size: small
-        widgets:
-          - type: releases
-            title: Latest Releases
-            repositories:
-              - glanceapp/glance
-              - jellyfin/jellyfin
-              - sonarr/sonarr
-              - radarr/radarr
-              - prowlarr/prowlarr
-              - qbittorrent/qbittorrent
-            limit: 8
-            collapse-after: 5
