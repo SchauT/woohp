@@ -51,10 +51,12 @@ pages:
             title: Services
             sites:
               - title: ArgoCD
-                url: http://argocd-server.argocd.svc.woohp.local
+                url: https://argo.raccoon-pence.ts.net/
+                check-url: http://argocd-server.argocd.svc.woohp.local
                 icon: si:argo
               - title: Longhorn
-                url: http://longhorn-frontend.longhorn-system.svc.woohp.local
+                url: https://longhorn.raccoon-pence.ts.net/#/dashboard
+                check-url: http://longhorn-frontend.longhorn-system.svc.woohp.local
                 icon: si:longhorn
 
           - $include: random-duck.yml
@@ -262,7 +264,6 @@ pages:
               - sonarr/sonarr
               - radarr/radarr
               - prowlarr/prowlarr
-              - qbittorrent/qBittorrent
               - argoproj/argo-cd
               - longhorn/longhorn
             limit: 10
