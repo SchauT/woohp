@@ -53,6 +53,7 @@ pages:
               - title: ArgoCD
                 url: https://argo.raccoon-pence.ts.net/
                 check-url: http://argocd-server.argocd.svc.woohp.local
+                alt-status-codes: [307]  # Consider 307 as "up" as argoCD API redirects HTTP to HTTPS
                 icon: si:argo
               - title: Longhorn
                 url: https://longhorn.raccoon-pence.ts.net/#/dashboard
