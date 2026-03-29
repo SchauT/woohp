@@ -1,10 +1,82 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "helm-values": {},
-  "kubernetes": {
-    "managerFilePatterns": [
-      "/k8s/.+\.ya?ml$/"
+  "extends": [
+    "config:recommended"
+  ],
+  "ignorePaths": [
+    "talos/clusterconfig/**"
+  ],
+  "labels": [
+    "renovate"
+  ],
+  "helmv3": {
+    "fileMatch": [
+      "k8s/charts/.+/Chart\\.yaml$"
     ]
-  }
+  },
+  "helm-values": {
+    "fileMatch": [
+      "k8s/charts/.+/values\\.yaml$"
+    ]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^talos/talconfig\\.yaml$"
+      ],
+      "matchStrings": [
+        "talosVersion:\\s*(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "siderolabs/talos",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^talos/talconfig\\.yaml$"
+      ],
+      "matchStrings": [
+        "kubernetesVersion:\\s*(?<currentValue>v[\\d.]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes/kubernetes",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "groupName": "Helm chart dependencies",
+      "matchManagers": [
+        "helmv3"
+      ]
+    },
+    {
+      "groupName": "Container images",
+      "matchManagers": [
+        "helm-values"
+      ]
+    },
+    {
+      "groupName": "Talos Linux",
+      "matchPackageNames": [
+        "siderolabs/talos"
+      ]
+    },
+    {
+      "groupName": "Kubernetes",
+      "matchPackageNames": [
+        "kubernetes/kubernetes"
+      ]
+    },
+    {
+      "groupName": "Talos + Kubernetes",
+      "matchPackageNames": [
+        "siderolabs/talos",
+        "kubernetes/kubernetes"
+      ],
+      "automerge": false
+    }
+  ]
 }
