@@ -11,19 +11,19 @@
   ],
   "helmv3": {
     "managerFilePatterns": [
-      "k8s/charts/.+/Chart\\.yaml$"
+      "/k8s/charts/.+/Chart\\.yaml$/"
     ]
   },
   "helm-values": {
     "managerFilePatterns": [
-      "k8s/charts/.+/values\\.yaml$"
+      "/k8s/charts/.+/values\\.yaml$/"
     ]
   },
   "customManagers": [
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "talos/talconfig\\.yaml$"
+        "/talos/talconfig\\.yaml$/"
       ],
       "matchStrings": [
         "talosVersion:\\s*(?<currentValue>v[\\d.]+)"
@@ -35,7 +35,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "talos/talconfig\\.yaml$"
+        "/talos/talconfig\\.yaml$/"
       ],
       "matchStrings": [
         "kubernetesVersion:\\s*(?<currentValue>v[\\d.]+)"
