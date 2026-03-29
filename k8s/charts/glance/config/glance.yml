@@ -100,6 +100,9 @@ pages:
                   - title: GitHub
                     url: https://github.com/SchauT/woohp
                     icon: si:github
+                  - title: Renovate Executions
+                    url: https://developer.mend.io/github/SchauT/woohp
+                    icon: si:renovate
                   - title: Cloudflare
                     url: https://dash.cloudflare.com
                     icon: si:cloudflare
