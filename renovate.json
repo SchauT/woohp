@@ -10,19 +10,19 @@
     "renovate"
   ],
   "helmv3": {
-    "fileMatch": [
+    "managerFilePatterns": [
       "k8s/charts/.+/Chart\\.yaml$"
     ]
   },
   "helm-values": {
-    "fileMatch": [
+    "managerFilePatterns": [
       "k8s/charts/.+/values\\.yaml$"
     ]
   },
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
+      "managerFilePatterns": [
         "^talos/talconfig\\.yaml$"
       ],
       "matchStrings": [
@@ -34,7 +34,7 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
+      "managerFilePatterns": [
         "^talos/talconfig\\.yaml$"
       ],
       "matchStrings": [
