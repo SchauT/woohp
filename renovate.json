@@ -35,7 +35,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "^talos/talconfig\\.yaml$"
+        "/talconfig\\.yaml$/"
       ],
       "matchStrings": [
         "kubernetesVersion:\\s*(?<currentValue>v[\\d.]+)"
