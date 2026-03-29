@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: docker.io/glanceapp/glance
+  repository: glanceapp/glance
   pullPolicy: IfNotPresent
   tag: "0.8.4"
 containerPort: 8080
