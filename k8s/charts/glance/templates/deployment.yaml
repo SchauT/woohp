@@ -1,36 +1,60 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: glance
-  namespace: default
+  name: {{ include "glance.fullname" . }}
+  labels:
+    {{- include "glance.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.glance.replicas }}
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: glance
+      {{- include "glance.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
-        app: glance
+        {{- include "glance.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
+      serviceAccountName: {{ include "glance.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
-      - name: glance
-        image: {{ .Values.glance.image }}
-        ports:
-        - containerPort: 8080
-          name: http
-        resources:
-          requests:
-            cpu: {{ .Values.glance.resources.requests.cpu }}
-            memory: {{ .Values.glance.resources.requests.memory }}
-          limits:
-            cpu: {{ .Values.glance.resources.limits.cpu }}
-            memory: {{ .Values.glance.resources.limits.memory }}
-        volumeMounts:
-        - name: config
-          mountPath: /app/config
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+              - containerPort: {{ .Values.containerPort }}
+                protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          - name: config
+            mountPath: /app/config
       volumes:
       - name: config
         configMap:
-          name: glance-config
+          name: {{ include "glance.fullname" . }}
           defaultMode: 0644

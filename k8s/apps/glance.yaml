@@ -15,7 +15,7 @@ spec:
       releaseName: glance
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: glance
+    namespace: default
   syncPolicy:
     automated:
       prune: true

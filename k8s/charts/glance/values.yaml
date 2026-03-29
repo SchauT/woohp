@@ -1,12 +1,62 @@
-glance:
-  image: glanceapp/glance:v0.8.4
-  replicas: 1
-  port: 8080
+replicaCount: 1
 
-  resources:
-    requests:
-      cpu: 100m
-      memory: 64Mi
-    limits:
-      cpu: 500m
-      memory: 256Mi
+image:
+  repository: docker.io/glanceapp/glance
+  pullPolicy: IfNotPresent
+  tag: "0.8.4"
+containerPort: 8080
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "tailscale"
+  annotations: {}
+  hosts:
+    - host: glance
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - glance
+      secretName: glance-tls
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /api/healthz
+    port: http
+readinessProbe:
+  httpGet:
+    path: /api/healthz
+    port: http

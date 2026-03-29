@@ -1,7 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: glance-config
-  namespace: default
+  name: {{ include "glance.fullname" . }}-config
+  labels:
+    {{- include "glance.labels" . | nindent 4 }}
 data:
 {{ (.Files.Glob "config/**").AsConfig | indent 2 }}
