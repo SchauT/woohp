@@ -55,8 +55,8 @@ resources:
 livenessProbe:
   httpGet:
     path: /api/healthz
-    port: http
+    port: app-http
 readinessProbe:
   httpGet:
     path: /api/healthz
-    port: http
+    port: app-http
