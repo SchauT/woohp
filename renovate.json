@@ -10,20 +10,20 @@
     "renovate"
   ],
   "helmv3": {
-    "fileMatch": [
-      "k8s/charts/.+/Chart\\.yaml$"
+    "managerFilePatterns": [
+      "/k8s/charts/.+/Chart\.yaml$/"
     ]
   },
   "helm-values": {
-    "fileMatch": [
-      "k8s/charts/.+/values\\.yaml$"
+    "managerFilePatterns": [
+      "/k8s/charts/.+/values\.yaml$/"
     ]
   },
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^talos/talconfig\\.yaml$"
+      "managerFilePatterns": [
+        "/^talos/talconfig\.yaml$/"
       ],
       "matchStrings": [
         "talosVersion:\\s*(?<currentValue>v[\\d.]+)"
@@ -34,8 +34,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^talos/talconfig\\.yaml$"
+      "managerFilePatterns": [
+        "/^talos/talconfig\.yaml$/"
       ],
       "matchStrings": [
         "kubernetesVersion:\\s*(?<currentValue>v[\\d.]+)"
