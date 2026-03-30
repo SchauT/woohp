@@ -8,3 +8,53 @@ argo-cd:
       ingressClassName: "tailscale"
       hostname: "argo"
       tls: true
+
+  repoServer:
+    # -------------------------------------------------------------------------
+    # Expose sops + helm-secrets au repoServer
+    # -------------------------------------------------------------------------
+    env:
+      - name: HELM_PLUGINS
+        value: /custom-tools/helm-plugins
+      - name: HELM_SECRETS_SOPS_PATH
+        value: /custom-tools/sops
+      - name: SOPS_AGE_KEY_FILE
+        value: /helm-secrets-private-keys/key.txt
+
+    volumes:
+      - name: custom-tools
+        emptyDir: {}
+      - name: sops-age-key
+        secret:
+          secretName: sops-age-key   # bootstrappé une seule fois à la main (voir README)
+
+    initContainers:
+      - name: install-tools
+        image: alpine:3.21
+        command: [sh, -ec]
+        args:
+          - |
+            apk add --no-cache curl bash
+            # sops — version alignée sur talsecret.sops.yaml
+            curl -sSLo /custom-tools/sops \
+              https://github.com/getsops/sops/releases/download/v3.9.4/sops-v3.9.4.linux.amd64
+            chmod +x /custom-tools/sops
+            # helm (nécessaire pour helm plugin install)
+            curl -sSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
+              | HELM_INSTALL_DIR=/custom-tools VERIFY_CHECKSUM=false bash
+            # helm-secrets
+            HELM_PLUGINS=/custom-tools/helm-plugins \
+              /custom-tools/helm plugin install \
+              https://github.com/jkroepke/helm-secrets --version v4.6.5
+        volumeMounts:
+          - mountPath: /custom-tools
+            name: custom-tools
+
+    volumeMounts:
+      - mountPath: /custom-tools
+        name: custom-tools
+        readOnly: true
+      - mountPath: /helm-secrets-private-keys/key.txt
+        name: sops-age-key
+        subPath: key.txt
+        readOnly: true

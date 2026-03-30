@@ -1,0 +1,22 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: paperless-db
+  namespace: {{ .Release.Namespace }}
+spec:
+  instances: 3
+
+  storage:
+    storageClass: longhorn
+    size: 5Gi
+
+  bootstrap:
+    initdb:
+      database: paperless
+      owner: paperless
+      secret:
+        name: paperless-db-credentials
+
+  # CNPG génère automatiquement le secret "paperless-db-app" avec :
+  # host, port, dbname, user, password, uri, pgpass
+  # https://cloudnative-pg.io/docs/1.28/applications#secrets

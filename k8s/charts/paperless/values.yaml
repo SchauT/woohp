@@ -1,0 +1,87 @@
+paperless-ngx:
+  env:
+    PAPERLESS_URL: "https://paperless.raccoon-pence.ts.net"
+    PAPERLESS_TIME_ZONE: "Europe/Paris"
+    PAPERLESS_OCR_LANGUAGE: "fra+eng"
+    PAPERLESS_REDIS: "redis://paperless-redis-master:6379"
+
+    # PostgreSQL — secret généré par CNPG à partir de paperless-db-credentials
+    PAPERLESS_DBENGINE: "postgresql"
+    PAPERLESS_DBHOST:
+      valueFrom:
+        secretKeyRef:
+          name: paperless-db-app
+          key: host
+    PAPERLESS_DBPORT:
+      valueFrom:
+        secretKeyRef:
+          name: paperless-db-app
+          key: port
+    PAPERLESS_DBNAME:
+      valueFrom:
+        secretKeyRef:
+          name: paperless-db-app
+          key: dbname
+    PAPERLESS_DBUSER:
+      valueFrom:
+        secretKeyRef:
+          name: paperless-db-app
+          key: user
+    PAPERLESS_DBPASS:
+      valueFrom:
+        secretKeyRef:
+          name: paperless-db-app
+          key: password
+
+    # Secrets applicatifs — injectés via templates/secrets.yaml (déchiffré par helm-secrets + sops)
+    PAPERLESS_SECRET_KEY:
+      valueFrom:
+        secretKeyRef:
+          name: paperless-credentials
+          key: secret-key
+    PAPERLESS_ADMIN_USER: "admin"
+    PAPERLESS_ADMIN_PASSWORD:
+      valueFrom:
+        secretKeyRef:
+          name: paperless-credentials
+          key: admin-password
+
+  redis:
+    enabled: true
+    architecture: standalone
+    auth:
+      enabled: false
+
+  postgresql:
+    enabled: false
+
+  ingress:
+    main:
+      enabled: true
+      ingressClassName: tailscale
+      hosts:
+        - host: paperless
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - paperless
+
+  persistence:
+    data:
+      enabled: true
+      storageClass: longhorn
+      size: 5Gi
+    media:
+      enabled: true
+      storageClass: longhorn
+      size: 20Gi
+    consume:
+      enabled: true
+      storageClass: longhorn
+      size: 5Gi
+    export:
+      enabled: true
+      storageClass: longhorn
+      size: 5Gi

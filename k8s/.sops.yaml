@@ -1,0 +1,8 @@
+## Règles SOPS pour les secrets Kubernetes
+## Même clé age que talos/.sops.yaml
+
+---
+creation_rules:
+  - path_regex: charts/.*/secrets\.yaml$
+    age: >-
+      age16pq0dazk46s5mg8wdduccsx69sgu5namyls7q7pph0vx8nzrfsds0pnfvl
