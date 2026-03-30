@@ -30,7 +30,7 @@ argo-cd:
 
     initContainers:
       - name: install-tools
-        image: alpine:3.21
+        image: alpine:3.23
         command: [sh, -ec]
         args:
           - |
