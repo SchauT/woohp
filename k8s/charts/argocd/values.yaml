@@ -15,44 +15,104 @@ argo-cd:
     # -------------------------------------------------------------------------
     env:
       - name: HELM_PLUGINS
-        value: /custom-tools/helm-plugins
+        value: /gitops-tools/helm-plugins/
+      - name: HELM_SECRETS_CURL_PATH
+        value: /gitops-tools/curl
       - name: HELM_SECRETS_SOPS_PATH
-        value: /custom-tools/sops
+        value: /gitops-tools/sops
+      - name: HELM_SECRETS_VALS_PATH
+        value: /gitops-tools/vals
+      - name: HELM_SECRETS_AGE_PATH
+        value: /gitops-tools/age
+      - name: HELM_SECRETS_KUBECTL_PATH
+        value: /gitops-tools/kubectl
+      - name: HELM_SECRETS_BACKEND
+        value: sops
       - name: SOPS_AGE_KEY_FILE
         value: /helm-secrets-private-keys/key.txt
 
+      # https://github.com/jkroepke/helm-secrets/wiki/Security-in-shared-environments
+      - name: HELM_SECRETS_VALUES_ALLOW_SYMLINKS
+        value: "false"
+      - name: HELM_SECRETS_VALUES_ALLOW_ABSOLUTE_PATH
+        value: "true"
+      - name: HELM_SECRETS_VALUES_ALLOW_PATH_TRAVERSAL
+        value: "false"
+      - name: HELM_SECRETS_WRAPPER_ENABLED
+        value: "true"
+      - name: HELM_SECRETS_DECRYPT_SECRETS_IN_TMP_DIR
+        value: "true"
+      - name: HELM_SECRETS_HELM_PATH
+        value: /usr/local/bin/helm
+
     volumes:
-      - name: custom-tools
+      - name: gitops-tools
         emptyDir: {}
       - name: sops-age-key
         secret:
           secretName: sops-age-key   # bootstrappé une seule fois à la main (voir README)
 
     initContainers:
-      - name: install-tools
-        image: alpine:3.21
-        command: [sh, -ec]
+      - name: download-tools
+        image: alpine:latest
+        imagePullPolicy: IfNotPresent
+        command: [sh, -euc]
+        env:
+          - name: HELM_SECRETS_VERSION
+            value: "4.7.5"
+          - name: KUBECTL_VERSION
+            value: "1.35.3"
+          - name: VALS_VERSION
+            value: "0.43.7"
+          - name: SOPS_VERSION
+            value: "3.12.2"
+          - name: AGE_VERSION
+            value: "1.3.1"
+          - name: HELM_PLUGINS
+            value: /gitops-tools/helm-plugins/
+          - name: HELM_SECRETS_CURL_PATH
+            value: /gitops-tools/curl
+          - name: HELM_SECRETS_SOPS_PATH
+            value: /gitops-tools/sops
+          - name: HELM_SECRETS_VALS_PATH
+            value: /gitops-tools/vals
+          - name: HELM_SECRETS_AGE_PATH
+            value: /gitops-tools/age
+          - name: HELM_SECRETS_KUBECTL_PATH
+            value: /gitops-tools/kubectl
         args:
           - |
-            apk add --no-cache curl bash
-            # sops — version alignée sur talsecret.sops.yaml
-            curl -sSLo /custom-tools/sops \
-              https://github.com/getsops/sops/releases/download/v3.9.4/sops-v3.9.4.linux.amd64
-            chmod +x /custom-tools/sops
-            # helm (nécessaire pour helm plugin install)
-            curl -sSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
-              | HELM_INSTALL_DIR=/custom-tools VERIFY_CHECKSUM=false bash
-            # helm-secrets
-            HELM_PLUGINS=/custom-tools/helm-plugins \
-              /custom-tools/helm plugin install \
-              https://github.com/jkroepke/helm-secrets --version v4.6.5
+            mkdir -p "${HELM_PLUGINS}"
+
+            export CURL_ARCH=$(uname -m | sed -e 's/x86_64/amd64/')
+            wget -qO "${HELM_SECRETS_CURL_PATH}" https://github.com/moparisthebest/static-curl/releases/latest/download/curl-${CURL_ARCH}
+
+            export GO_ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')
+            wget -qO "${HELM_SECRETS_KUBECTL_PATH}" https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/${GO_ARCH}/kubectl
+            wget -qO "${HELM_SECRETS_SOPS_PATH}" https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.${GO_ARCH}
+            wget -qO- https://github.com/helmfile/vals/releases/download/v${VALS_VERSION}/vals_${VALS_VERSION}_linux_${GO_ARCH}.tar.gz | tar zxv -C "${HELM_SECRETS_VALS_PATH%/*}" vals
+            wget -qO- https://github.com/jkroepke/helm-secrets/releases/download/v${HELM_SECRETS_VERSION}/helm-secrets.tar.gz | tar -C "${HELM_PLUGINS}" -xzf-
+            wget -qO- "https://github.com/FiloSottile/age/releases/download/v${AGE_VERSION}/age-v${AGE_VERSION}-linux-amd64.tar.gz" | tar -xzf- --strip-components=1 -C "${HELM_SECRETS_AGE_PATH%/*}" age/age
+
+            chmod +x \
+              "${HELM_SECRETS_CURL_PATH}" \
+              "${HELM_SECRETS_SOPS_PATH}" \
+              "${HELM_SECRETS_KUBECTL_PATH}" \
+              "${HELM_SECRETS_VALS_PATH}" \
+              "${HELM_SECRETS_AGE_PATH}"
+
+            cp "${HELM_PLUGINS}/helm-secrets/scripts/wrapper/helm.sh" /gitops-tools/helm
         volumeMounts:
-          - mountPath: /custom-tools
-            name: custom-tools
+          - mountPath: /gitops-tools
+            name: gitops-tools
 
     volumeMounts:
-      - mountPath: /custom-tools
-        name: custom-tools
+      - mountPath: /gitops-tools
+        name: gitops-tools
+        readOnly: true
+      - mountPath: /usr/local/sbin/helm
+        subPath: helm
+        name: gitops-tools
         readOnly: true
       - mountPath: /helm-secrets-private-keys/key.txt
         name: sops-age-key
