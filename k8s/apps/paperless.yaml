@@ -15,7 +15,7 @@ spec:
       releaseName: paperless
       valueFiles:
         - values.yaml
-        - secrets://secrets.yaml    # déchiffré par helm-secrets via sops+age
+        - secrets.yaml    # déchiffré par helm-secrets via sops+age
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: paperless
