@@ -66,7 +66,7 @@ pages:
                 icon: si:longhorn
               - title: QBittorrent
                 url: https://qbittorrent.raccoon-pence.ts.net/
-                check-url: http://qbittorrent.media.svc.woohp.local
+                check-url: http://qbittorrent.media.svc.woohp.local:8200
                 icon: si:qbittorrent
 
           - $include: random-duck.yml
