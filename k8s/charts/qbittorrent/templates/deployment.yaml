@@ -61,8 +61,8 @@ spec:
               path: /v1/vpn/status
               port: {{ .Values.gluetun.controlPort }}
             initialDelaySeconds: 10
-            periodSeconds: 5
-            failureThreshold: 30
+            periodSeconds: 15
+            failureThreshold: 40
           {{- with .Values.resources.gluetun }}
           resources:
             {{- toYaml . | nindent 12 }}
@@ -97,14 +97,14 @@ spec:
               path: /
               port: webui
             initialDelaySeconds: 20
-            periodSeconds: 10
+            periodSeconds: 15
             failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /
               port: webui
             initialDelaySeconds: 60
-            periodSeconds: 15
+            periodSeconds: 20
           {{- with .Values.resources.qbittorrent }}
           resources:
             {{- toYaml . | nindent 12 }}
