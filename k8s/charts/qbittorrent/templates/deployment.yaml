@@ -14,6 +14,9 @@ spec:
       {{- include "qbittorrent.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        # Restart pod when the init ConfigMap changes
+        checksum/config: {{ include (print .Template.BasePath "/configmap-init.yaml") . | sha256sum }}
       labels:
         {{- include "qbittorrent.labels" . | nindent 8 }}
     spec:
@@ -82,6 +85,9 @@ spec:
               value: {{ .Values.env.TZ | quote }}
             - name: WEBUI_PORT
               value: {{ .Values.webuiPort | quote }}
+            # VueTorrent alternative WebUI — installed at /vuetorrent by the LSIO mod
+            - name: DOCKER_MODS
+              value: "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest"
           ports:
             - name: webui
               containerPort: {{ .Values.webuiPort }}
@@ -108,6 +114,8 @@ spec:
               mountPath: /config
             - name: media-data
               mountPath: /data
+            - name: qbittorrent-init
+              mountPath: /custom-cont-init.d
       volumes:
         - name: tun-device
           hostPath:
@@ -116,6 +124,10 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: {{ include "qbittorrent.fullname" . }}-config
+        - name: qbittorrent-init
+          configMap:
+            name: {{ include "qbittorrent.fullname" . }}-init
+            defaultMode: 0755
         - name: media-data
           persistentVolumeClaim:
             claimName: media-data

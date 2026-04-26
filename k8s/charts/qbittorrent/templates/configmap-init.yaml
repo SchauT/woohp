@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "qbittorrent.fullname" . }}-init
+  labels:
+    {{- include "qbittorrent.labels" . | nindent 4 }}
+data:
+  01-qbittorrent-config.sh: |
+    #!/bin/sh
+    # Declarative qBittorrent settings managed via GitOps (ConfigMap).
+    # Executed inside the container by LinuxServer.io custom-cont-init.d,
+    # after LSIO's own init (which creates qBittorrent.conf), before the app starts.
+    set -e
+
+    CONF="/config/qBittorrent/qBittorrent.conf"
+    mkdir -p /config/qBittorrent
+
+    # Sets or updates a key under [Preferences].
+    # Keys use qBittorrent's backslash notation (e.g. WebUI\AlternativeUIEnabled).
+    qb_set() {
+      key="$1"
+      value="$2"
+      # Escape backslashes for sed/grep regex matching
+      esc_key=$(printf '%s' "$key" | sed 's/\\/\\\\/g')
+
+      if grep -q "^${esc_key}=" "$CONF" 2>/dev/null; then
+        # Key already exists: update in-place.
+        # Also escape backslashes in the replacement to prevent sed from
+        # interpreting them (e.g. \A would drop the backslash in POSIX sed).
+        esc_repl=$(printf '%s=%s' "$key" "$value" | sed 's/\\/\\\\/g')
+        sed -i "s|^${esc_key}=.*|${esc_repl}|" "$CONF"
+      elif grep -q '^\[Preferences\]' "$CONF" 2>/dev/null; then
+        # File exists but key is missing: insert right after [Preferences].
+        # Using awk to avoid multiline sed portability issues (busybox vs GNU).
+        awk -v k="$key" -v v="$value" '
+          /^\[Preferences\]/ { print; print k"="v; next }
+          { print }
+        ' "$CONF" > "${CONF}.tmp" && mv "${CONF}.tmp" "$CONF"
+      else
+        # No [Preferences] section yet (fresh install before first qBittorrent run).
+        printf '[Preferences]\n%s=%s\n' "$key" "$value" >> "$CONF"
+      fi
+    }
+
+    # --- VueTorrent alternative WebUI ---
+    # DOCKER_MODS installs VueTorrent files at /vuetorrent before this script runs.
+    qb_set 'WebUI\AlternativeUIEnabled' 'true'
+    qb_set 'WebUI\RootFolder' '/vuetorrent'
+
+    # --- Authentication ---
+    # Disabled: access is already protected by Tailscale (no open ports to the internet).
+    qb_set 'WebUI\LocalHostAuth' 'false'
+
+    # --- Download paths (must match the NFS mount at /data) ---
+    qb_set 'Downloads\SavePath' '/data/downloads/complete/'
+    qb_set 'Downloads\TempPath' '/data/downloads/incomplete/'
+    qb_set 'Downloads\TempPathEnabled' 'true'
