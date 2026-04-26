@@ -1,0 +1,61 @@
+image:
+  repository: lscr.io/linuxserver/qbittorrent
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+webuiPort: 8200
+
+env:
+  PUID: "1001"
+  PGID: "988"
+  UMASK: "0002"
+  TZ: "Europe/Paris"
+
+gluetun:
+  image:
+    repository: qmcgaw/gluetun
+    tag: "latest"
+  controlPort: 8320
+  vpnServiceProvider: protonvpn
+  vpnType: wireguard
+  serverCountries: Switzerland
+  # Allow LAN + pod + service subnets to bypass the VPN
+  firewallOutboundSubnets: "192.168.1.0/24,10.244.0.0/16,10.96.0.0/12"
+
+persistence:
+  config:
+    storageClass: longhorn
+    size: 5Gi
+
+service:
+  type: ClusterIP
+  port: 8200
+
+ingress:
+  enabled: true
+  className: tailscale
+  hosts:
+    - host: qbittorrent
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - qbittorrent
+      secretName: qbittorrent-tls
+
+resources:
+  qbittorrent:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "2"
+      memory: 1Gi
+  gluetun:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi

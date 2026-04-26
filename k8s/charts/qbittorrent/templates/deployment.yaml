@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "qbittorrent.fullname" . }}
+  labels:
+    {{- include "qbittorrent.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  # Recreate required: config PVC is ReadWriteOnce
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "qbittorrent.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "qbittorrent.labels" . | nindent 8 }}
+    spec:
+      # Gluetun runs as a native sidecar (K8s 1.29+): starts before qbittorrent,
+      # restarts independently, and qbittorrent waits for its readiness probe.
+      initContainers:
+        - name: gluetun
+          image: "{{ .Values.gluetun.image.repository }}:{{ .Values.gluetun.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          restartPolicy: Always
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: VPN_SERVICE_PROVIDER
+              value: {{ .Values.gluetun.vpnServiceProvider | quote }}
+            - name: VPN_TYPE
+              value: {{ .Values.gluetun.vpnType | quote }}
+            - name: SERVER_COUNTRIES
+              value: {{ .Values.gluetun.serverCountries | quote }}
+            - name: VPN_PORT_FORWARDING
+              value: "on"
+            - name: FIREWALL_OUTBOUND_SUBNETS
+              value: {{ .Values.gluetun.firewallOutboundSubnets | quote }}
+            - name: HTTP_CONTROL_SERVER_ADDRESS
+              value: ":{{ .Values.gluetun.controlPort }}"
+            - name: WIREGUARD_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gluetun-vpn-credentials
+                  key: wireguard-private-key
+            - name: WIREGUARD_ADDRESSES
+              valueFrom:
+                secretKeyRef:
+                  name: gluetun-vpn-credentials
+                  key: wireguard-addresses
+          readinessProbe:
+            httpGet:
+              path: /v1/openvpn/status
+              port: {{ .Values.gluetun.controlPort }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
+          {{- with .Values.resources.gluetun }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: tun-device
+              mountPath: /dev/net/tun
+      containers:
+        - name: qbittorrent
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: PUID
+              value: {{ .Values.env.PUID | quote }}
+            - name: PGID
+              value: {{ .Values.env.PGID | quote }}
+            - name: UMASK
+              value: {{ .Values.env.UMASK | quote }}
+            - name: TZ
+              value: {{ .Values.env.TZ | quote }}
+            - name: WEBUI_PORT
+              value: {{ .Values.webuiPort | quote }}
+          ports:
+            - name: webui
+              containerPort: {{ .Values.webuiPort }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: webui
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: webui
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          {{- with .Values.resources.qbittorrent }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media-data
+              mountPath: /data
+      volumes:
+        - name: tun-device
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ include "qbittorrent.fullname" . }}-config
+        - name: media-data
+          persistentVolumeClaim:
+            claimName: media-data
