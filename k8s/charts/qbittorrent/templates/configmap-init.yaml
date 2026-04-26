@@ -7,51 +7,41 @@ metadata:
 data:
   01-qbittorrent-config.sh: |
     #!/bin/sh
-    # Declarative qBittorrent settings managed via GitOps (ConfigMap).
-    # Executed inside the container by LinuxServer.io custom-cont-init.d,
-    # after LSIO's own init (which creates qBittorrent.conf), before the app starts.
+    # Declarative qBittorrent [Preferences] — managed via GitOps (ConfigMap).
+    # Source of truth: Git. Changes made in the WebUI are reset on pod restart.
+    # Torrent state lives in BT_backup/ and is NOT affected by this script.
+    #
+    # Backslash note: qBittorrent INI keys contain backslashes (e.g. WebUI\Port).
+    # awk -v strips unrecognised escapes (\R→R), so we use printf with \\ instead
+    # (YAML literal block → shell sees \\foo → printf outputs \foo).
     set -e
 
     CONF="/config/qBittorrent/qBittorrent.conf"
-    mkdir -p /config/qBittorrent
+    mkdir -p "$(dirname "$CONF")"
 
-    # Sets or updates a key under [Preferences].
-    # Keys use qBittorrent's backslash notation (e.g. WebUI\AlternativeUIEnabled).
-    qb_set() {
-      key="$1"
-      value="$2"
-      # Escape backslashes for sed/grep regex matching
-      esc_key=$(printf '%s' "$key" | sed 's/\\/\\\\/g')
+    # Keep all sections except [Preferences] from any existing config
+    # ([BitTorrent] holds torrent session state, [Network] proxy settings, etc.)
+    BASE="${CONF}.init-base"
+    if [ -f "$CONF" ]; then
+      awk '/^\[Preferences\]/{skip=1;next} /^\[/{skip=0} !skip{print}' "$CONF" > "$BASE"
+    else
+      # Fresh install: seed legal notice acceptance so qBittorrent does not prompt.
+      printf '[LegalNotice]\nAccepted=true\n\n' > "$BASE"
+    fi
 
-      if grep -q "^${esc_key}=" "$CONF" 2>/dev/null; then
-        # Key already exists: update in-place.
-        # Also escape backslashes in the replacement to prevent sed from
-        # interpreting them (e.g. \A would drop the backslash in POSIX sed).
-        esc_repl=$(printf '%s=%s' "$key" "$value" | sed 's/\\/\\\\/g')
-        sed -i "s|^${esc_key}=.*|${esc_repl}|" "$CONF"
-      elif grep -q '^\[Preferences\]' "$CONF" 2>/dev/null; then
-        # File exists but key is missing: insert right after [Preferences].
-        # Using awk to avoid multiline sed portability issues (busybox vs GNU).
-        awk -v k="$key" -v v="$value" '
-          /^\[Preferences\]/ { print; print k"="v; next }
-          { print }
-        ' "$CONF" > "${CONF}.tmp" && mv "${CONF}.tmp" "$CONF"
-      else
-        # No [Preferences] section yet (fresh install before first qBittorrent run).
-        printf '[Preferences]\n%s=%s\n' "$key" "$value" >> "$CONF"
-      fi
-    }
+    # Write our controlled [Preferences] block.
+    # Each printf '\\ ' in this script is two chars in the YAML literal block,
+    # which the shell receives as '\\', and printf renders as a single '\'.
+    {
+      printf '[Preferences]\n'
+      printf 'Downloads\\SavePath=/data/downloads/complete/\n'
+      printf 'Downloads\\TempPath=/data/downloads/incomplete/\n'
+      printf 'Downloads\\TempPathEnabled=true\n'
+      printf 'WebUI\\AlternativeUIEnabled=true\n'
+      printf 'WebUI\\AuthSubnetWhitelist=0.0.0.0/0, ::/0\n'
+      printf 'WebUI\\AuthSubnetWhitelistEnabled=true\n'
+      printf 'WebUI\\LocalHostAuth=false\n'
+      printf 'WebUI\\RootFolder=/vuetorrent\n'
+    } >> "$BASE"
 
-    # --- VueTorrent alternative WebUI ---
-    # DOCKER_MODS installs VueTorrent files at /vuetorrent before this script runs.
-    qb_set 'WebUI\AlternativeUIEnabled' 'true'
-    qb_set 'WebUI\RootFolder' '/vuetorrent'
-
-    # --- Authentication ---
-    # Disabled: access is already protected by Tailscale (no open ports to the internet).
-    qb_set 'WebUI\LocalHostAuth' 'false'
-
-    # --- Download paths (must match the NFS mount at /data) ---
-    qb_set 'Downloads\SavePath' '/data/downloads/complete/'
-    qb_set 'Downloads\TempPath' '/data/downloads/incomplete/'
-    qb_set 'Downloads\TempPathEnabled' 'true'
+    mv "$BASE" "$CONF"
