@@ -55,15 +55,19 @@ pages:
                 check-url: http://argocd-server.argocd.svc.woohp.local
                 allow-insecure: true
                 icon: si:argo
-              - title: Longhorn
-                url: https://longhorn.raccoon-pence.ts.net/#/dashboard
-                check-url: http://longhorn-frontend.longhorn-system.svc.woohp.local
-                icon: si:longhorn
               - title: TrueNAS
                 url: http://192.168.1.110
                 check-url: http://192.168.1.110
                 allow-insecure: true
                 icon: si:truenas
+              - title: Longhorn
+                url: https://longhorn.raccoon-pence.ts.net/#/dashboard
+                check-url: http://longhorn-frontend.longhorn-system.svc.woohp.local
+                icon: si:longhorn
+              - title: QBittorrent
+                url: https://qbittorrent.raccoon-pence.ts.net/
+                check-url: http://qbittorrent.media.svc.woohp.local
+                icon: si:qbittorrent
 
           - $include: random-duck.yml
 
