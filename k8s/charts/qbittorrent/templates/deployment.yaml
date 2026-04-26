@@ -17,8 +17,6 @@ spec:
       labels:
         {{- include "qbittorrent.labels" . | nindent 8 }}
     spec:
-      # Gluetun runs as a native sidecar (K8s 1.29+): starts before qbittorrent,
-      # restarts independently, and qbittorrent waits for its readiness probe.
       initContainers:
         - name: gluetun
           image: "{{ .Values.gluetun.image.repository }}:{{ .Values.gluetun.image.tag }}"
@@ -41,6 +39,10 @@ spec:
               value: {{ .Values.gluetun.firewallOutboundSubnets | quote }}
             - name: HTTP_CONTROL_SERVER_ADDRESS
               value: ":{{ .Values.gluetun.controlPort }}"
+            # Disable auth so the K8s readiness probe can reach the control server
+            # (safe: port is only accessible within the pod)
+            - name: HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE
+              value: '{"auth":"none"}'
             - name: WIREGUARD_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -53,7 +55,7 @@ spec:
                   key: wireguard-addresses
           readinessProbe:
             httpGet:
-              path: /v1/openvpn/status
+              path: /v1/vpn/status
               port: {{ .Values.gluetun.controlPort }}
             initialDelaySeconds: 10
             periodSeconds: 5
