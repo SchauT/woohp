@@ -1,7 +1,7 @@
 nfs:
   server: 192.168.1.110
   path: /mnt/default/woohp/medias
-  capacity: 1,.2Ti
+  capacity: 1.1Ti
 
 gluetun:
   # Non-secret VPN settings
