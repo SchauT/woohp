@@ -1,0 +1,17 @@
+nfs:
+  server: 192.168.1.110
+  path: /mnt/default/woohp/medias
+  # Adjust to match your actual NFS export capacity
+  capacity: 2Ti
+
+gluetun:
+  # Non-secret VPN settings
+  vpnServiceProvider: protonvpn
+  vpnType: wireguard
+  serverCountries: Switzerland
+  # Allow intra-cluster and LAN traffic to bypass the VPN
+  # pod subnet: 10.244.0.0/16, service subnet: 10.96.0.0/12, LAN: 192.168.1.0/24
+  firewallOutboundSubnets: "192.168.1.0/24,10.244.0.0/16,10.96.0.0/12"
+  # Secret values — provided via SOPS-encrypted secrets.yaml
+  wireguardPrivateKey: ""
+  wireguardAddresses: ""
