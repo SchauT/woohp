@@ -6,8 +6,8 @@ image:
 webuiPort: 8200
 
 env:
-  PUID: "1001"
-  PGID: "988"
+  PUID: "3001"
+  PGID: "3001"
   UMASK: "0002"
   TZ: "Europe/Paris"
 
