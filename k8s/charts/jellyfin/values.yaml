@@ -1,0 +1,44 @@
+image:
+  repository: jellyfin/jellyfin
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+containerPort: 8096
+
+securityContext:
+  runAsUser: 3001
+  runAsGroup: 3001
+  fsGroup: 3001
+
+env:
+  TZ: "Europe/Paris"
+
+persistence:
+  config:
+    storageClass: longhorn
+    size: 10Gi
+
+service:
+  type: ClusterIP
+  port: 8096
+
+ingress:
+  enabled: true
+  className: tailscale
+  hosts:
+    - host: jellyfin
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - jellyfin
+      secretName: jellyfin-tls
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: "4"
+    memory: 4Gi
