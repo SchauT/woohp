@@ -1,7 +1,7 @@
 image:
   repository: lscr.io/linuxserver/qbittorrent
   pullPolicy: IfNotPresent
-  tag: "5.1.4"
+  tag: "20.04.1"
 
 webuiPort: 8200
 
