@@ -1,7 +1,7 @@
 image:
   repository: lscr.io/linuxserver/qbittorrent
   pullPolicy: IfNotPresent
-  tag: "latest"
+  tag: "5.1.4"
 
 webuiPort: 8200
 
@@ -14,7 +14,7 @@ env:
 gluetun:
   image:
     repository: qmcgaw/gluetun
-    tag: "latest"
+    tag: "v3.41.0"
   controlPort: 8320
   vpnServiceProvider: protonvpn
   vpnType: wireguard
