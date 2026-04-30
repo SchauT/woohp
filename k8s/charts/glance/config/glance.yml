@@ -68,6 +68,26 @@ pages:
                 url: https://qbittorrent.raccoon-pence.ts.net/
                 check-url: http://qbittorrent.media.svc.woohp.local:8200
                 icon: si:qbittorrent
+              - title: Sonarr
+                url: https://sonarr.raccoon-pence.ts.net/
+                check-url: http://sonarr.media.svc.woohp.local:8989
+                icon: si:sonarr
+              - title: Radarr
+                url: https://radarr.raccoon-pence.ts.net/
+                check-url: http://radarr.media.svc.woohp.local:7878
+                icon: si:radarr
+              - title: Prowlarr
+                url: https://prowlarr.raccoon-pence.ts.net/
+                check-url: http://prowlarr.media.svc.woohp.local:9696
+                icon: si:prowlarr
+              - title: Jellyfin
+                url: https://jellyfin.raccoon-pence.ts.net/
+                check-url: http://jellyfin.media.svc.woohp.local:8096
+                icon: si:jellyfin
+              - title: Seerr
+                url: https://seerr.raccoon-pence.ts.net/
+                check-url: http://seerr.media.svc.woohp.local:5055
+                icon: si:requestanimations
 
           - $include: random-duck.yml
 
