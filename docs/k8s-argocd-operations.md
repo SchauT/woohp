@@ -60,6 +60,31 @@ For Paperless, `k8s/apps/paperless.yaml` includes `secrets.yaml` in Helm `valueF
 
 ArgoCD app-of-apps will discover and sync the new app.
 
+### Add Service Monitor to Glance Dashboard
+
+When deploying a new application with a web UI (optional but recommended):
+
+1. Edit `k8s/charts/glance/config/glance.yml`
+2. Locate the `monitor` widget under `sites:`
+3. Add an entry with the service name, Tailscale ingress URL, internal service check URL, and Simple Icons icon:
+
+```yaml
+- title: MyApp
+  url: https://myapp.raccoon-pence.ts.net/
+  check-url: http://myapp.namespace.svc.woohp.local:PORT
+  icon: si:myapp
+```
+
+Example for a service in the `media` namespace on port 8080:
+```yaml
+- title: MyService
+  url: https://myservice.raccoon-pence.ts.net/
+  check-url: http://myservice.media.svc.woohp.local:8080
+  icon: si:myservice
+```
+
+Glance polls each `check-url` internally and displays the health status with a colored indicator on the dashboard.
+
 ## Chart and Repo Conventions
 
 - Helm dependency archives (`*.tgz`) are not tracked.
