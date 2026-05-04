@@ -14,7 +14,7 @@ env:
 gluetun:
   image:
     repository: qmcgaw/gluetun
-    tag: "v3.41.0"
+    tag: "v3.41.1"
   controlPort: 8320
   vpnServiceProvider: protonvpn
   vpnType: wireguard
