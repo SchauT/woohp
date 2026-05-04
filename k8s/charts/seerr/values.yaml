@@ -1,39 +1,33 @@
-image:
-  repository: ghcr.io/seerr-team/seerr
-  pullPolicy: IfNotPresent
-  tag: "v3.0.1"
+seerr-chart:
+  image:
+    tag: "v3.2.0"
 
-containerPort: 5055
+  extraEnv:
+    - name: TZ
+      value: "Europe/Paris"
 
-env:
-  TZ: "Europe/Paris"
-
-persistence:
   config:
-    storageClass: longhorn
-    size: 2Gi
+    persistence:
+      storageClass: longhorn
+      size: 2Gi
 
-service:
-  type: ClusterIP
-  port: 5055
+  ingress:
+    enabled: true
+    ingressClassName: tailscale
+    hosts:
+      - host: seerr
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - seerr
+        secretName: seerr-tls
 
-ingress:
-  enabled: true
-  className: tailscale
-  hosts:
-    - host: seerr
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - hosts:
-        - seerr
-      secretName: seerr-tls
-
-resources:
-  requests:
-    cpu: 100m
-    memory: 128Mi
-  limits:
-    cpu: 500m
-    memory: 512Mi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
