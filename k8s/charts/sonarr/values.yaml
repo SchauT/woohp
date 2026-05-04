@@ -1,7 +1,7 @@
 image:
-  repository: sonarr/sonarr
+  repository: lscr.io/linuxserver/docker-sonarr
   pullPolicy: IfNotPresent
-  tag: "4.0.17.2952"
+  tag: "4.0.17.2952-ls310"
 
 containerPort: 8989
 
