@@ -61,6 +61,8 @@ kubectl get applications -n argocd
 - `talos/gen_and_apply_conf_to_all_nodes.sh` is interactive and can apply live node config changes. Review diffs carefully before confirming.
 - The age key secret `sops-age-key` must exist in namespace `argocd` before encrypted Helm value files can be decrypted by repo-server.
 - `k8s/charts/*/template.yml` files are generated snapshots and may drift; treat chart templates/manifests as source of truth.
+- Gluetun v3.39.1+ requires `HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE='{"auth":"none"}'` or readiness probes return 401. Use endpoint `/v1/vpn/status` (not the removed `/v1/openvpn/status`).
+- NFS-backed apps must use `PUID=3001`/`PGID=3001` (LinuxServer.io) or `runAsUser/Group/fsGroup: 3001` to match NAS dataset ownership. Mismatch causes silent permission-denied errors on writes.
 
 ## Docs Index
 

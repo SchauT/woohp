@@ -85,6 +85,68 @@ Example for a service in the `media` namespace on port 8080:
 
 Glance polls each `check-url` internally and displays the health status with a colored indicator on the dashboard.
 
+## VPN Sidecar Pattern (Gluetun)
+
+Use Gluetun as a native Kubernetes sidecar for applications that require VPN networking (e.g. qBittorrent).
+
+Native sidecar definition — place in `initContainers` with `restartPolicy: Always` so it starts before the main container and restarts independently:
+
+```yaml
+initContainers:
+  - name: gluetun
+    image: qmcgaw/gluetun:v3.41.0
+    restartPolicy: Always
+    securityContext:
+      capabilities:
+        add: [NET_ADMIN]
+    env:
+      - name: VPN_SERVICE_PROVIDER
+        value: custom
+      - name: VPN_TYPE
+        value: wireguard
+      - name: FIREWALL_OUTBOUND_SUBNETS
+        value: "192.168.1.0/24,10.244.0.0/16,10.96.0.0/12"
+      - name: HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE
+        value: '{"auth":"none"}'
+    readinessProbe:
+      httpGet:
+        path: /v1/vpn/status
+        port: 8320
+```
+
+WireGuard credentials (private key, addresses) live in a SOPS-encrypted `secrets.yaml` and are injected via `envFrom`.
+
+**Pitfall — Gluetun auth (v3.39.1+)**: The HTTP control server requires authentication by default since v3.39.1. Without `HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE: '{"auth":"none"}'`, readiness probes to `/v1/vpn/status` return 401 and the pod never becomes ready. The deprecated endpoint `/v1/openvpn/status` was removed; always use `/v1/vpn/status`.
+
+## Shared Infrastructure Chart Pattern
+
+When multiple applications in the same namespace share resources (Namespace, PersistentVolume, Secrets), create a dedicated `<namespace>-infra` chart deployed at `sync-wave: -1`.
+
+Example: `k8s/charts/media-infra/` creates:
+- `Namespace: media`
+- NFS `PersistentVolume` + `PersistentVolumeClaim` (`ReadWriteMany`) shared by all media apps
+- `Secret: gluetun-wireguard` consumed by the qBittorrent chart
+
+ArgoCD annotation to set wave in `k8s/apps/<infra-app>.yaml`:
+
+```yaml
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+```
+
+The infra chart deploys before any application chart that mounts the shared PVC or namespace.
+
+## NFS Volumes and PUID/PGID
+
+For apps mounting NFS shares from the TrueNAS NAS (`192.168.1.110:/mnt/default/woohp/medias`):
+
+- Use `ReadWriteMany` access mode on the PVC
+- Set `securityContext.fsGroup`, `runAsUser`, and `runAsGroup` to match the NAS dataset owner (currently `3001`/`3001`)
+- For LinuxServer.io images, use `PUID=3001` and `PGID=3001` environment variables instead of `securityContext`
+
+Mismatched UID/GID causes permission-denied errors on files written to the NFS share even when the pod starts cleanly.
+
 ## Chart and Repo Conventions
 
 - Helm dependency archives (`*.tgz`) are not tracked.
