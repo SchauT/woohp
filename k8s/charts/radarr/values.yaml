@@ -1,5 +1,5 @@
 image:
-  repository: lscr.io/linuxserver/docker-radarr
+  repository: lscr.io/linuxserver/radarr
   pullPolicy: IfNotPresent
   tag: "6.1.1.10360-ls301"
 
