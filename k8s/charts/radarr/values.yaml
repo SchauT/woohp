@@ -1,7 +1,7 @@
 image:
-  repository: radarr/radarr
+  repository: lscr.io/linuxserver/docker-radarr
   pullPolicy: IfNotPresent
-  tag: "6.1.1.10360"
+  tag: "6.1.1.10360-ls301"
 
 containerPort: 7878
 
