@@ -5,6 +5,9 @@ image:
 
 containerPort: 8096
 
+extraArgs:
+  - --restore-archive "/config/config/backups/jellyfin-backup-20260504145602.zip"
+
 securityContext:
   runAsUser: 3001
   runAsGroup: 3001
@@ -12,7 +15,6 @@ securityContext:
 
 env:
   TZ: "Europe/Paris"
-  restore-archive: "/config/config/backups/jellyfin-backup-20260504145602.zip"
 
 persistence:
   config:
