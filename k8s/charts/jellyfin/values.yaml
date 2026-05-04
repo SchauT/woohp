@@ -12,6 +12,7 @@ securityContext:
 
 env:
   TZ: "Europe/Paris"
+  restore-archive: "/config/config/backups/jellyfin-backup-20260504145602.zip"
 
 persistence:
   config:
