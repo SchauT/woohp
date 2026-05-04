@@ -87,7 +87,7 @@ pages:
               - title: Seerr
                 url: https://seerr.raccoon-pence.ts.net/
                 check-url: http://seerr.media.svc.woohp.local:5055
-                icon: si:requestanimations
+                icon: si:octopusdeploy
 
           - $include: random-duck.yml
 
