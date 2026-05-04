@@ -1,5 +1,5 @@
 image:
-  repository: lscr.io/linuxserver/docker-sonarr
+  repository: lscr.io/linuxserver/sonarr
   pullPolicy: IfNotPresent
   tag: "4.0.17.2952-ls310"
 
