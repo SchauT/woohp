@@ -80,6 +80,10 @@ pages:
                 url: https://prowlarr.raccoon-pence.ts.net/
                 check-url: http://prowlarr.media.svc.woohp.local:9696
                 icon: si:prowlarr
+              - title: FlareSolverr
+                check-url: http://flaresolverr.media.svc.woohp.local:8191
+                allow-insecure: true
+                icon: si:cloudflare
               - title: Jellyfin
                 url: https://jellyfin.raccoon-pence.ts.net/
                 check-url: http://jellyfin.media.svc.woohp.local:8096
