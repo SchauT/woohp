@@ -27,8 +27,8 @@ data:
     # which the shell receives as '\\', and printf renders as a single '\'.
     {
       printf '[BitTorrent]\n'
-      printf 'Session\\DefaultSavePath=/data/downloads/complete/\n'
-      printf 'Session\\TempPath=/data/downloads/incomplete/\n'
+      printf 'Session\\DefaultSavePath=/data/torrents/complete/\n'
+      printf 'Session\\TempPath=/data/torrents/incomplete/\n'
       printf 'Session\\TempPathEnabled=true\n'
       printf 'Session\\Port=54958\n'
       printf 'Session\\AddTorrentStopped=false\n'
@@ -52,8 +52,8 @@ data:
       printf 'AutoDeleteAddedTorrentFile=Never\n'
       printf '\n'
       printf '[Preferences]\n'
-      printf 'Downloads\\SavePath=/data/downloads/complete/\n'
-      printf 'Downloads\\TempPath=/data/downloads/incomplete/\n'
+      printf 'Downloads\\SavePath=/data/torrents/complete/\n'
+      printf 'Downloads\\TempPath=/data/torrents/incomplete/\n'
       printf 'Downloads\\TempPathEnabled=true\n'
       printf 'WebUI\\AlternativeUIEnabled=true\n'
       printf 'WebUI\\AuthSubnetWhitelist=0.0.0.0/0, ::/0\n'
