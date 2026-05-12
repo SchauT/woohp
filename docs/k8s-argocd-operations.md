@@ -48,8 +48,6 @@ Edit encrypted file safely:
 sops k8s/charts/<app>/secrets.yaml
 ```
 
-For Paperless, `k8s/apps/paperless.yaml` includes `secrets.yaml` in Helm `valueFiles`, and helm-secrets handles decryption in ArgoCD.
-
 ## Add a New Application
 
 1. Create chart folder: `k8s/charts/<app>/`
@@ -84,6 +82,65 @@ Example for a service in the `media` namespace on port 8080:
 ```
 
 Glance polls each `check-url` internally and displays the health status with a colored indicator on the dashboard.
+
+## Apps with CNPG PostgreSQL Database
+
+When an application needs a dedicated PostgreSQL database, declare a `postgresql.cnpg.io/v1 Cluster` resource directly inside the app's Helm chart (no separate chart required). The CNPG operator (deployed via `k8s/charts/cnpg/`) watches all namespaces and reconciles the cluster automatically.
+
+### Minimal cluster template
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: <app>-db
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn
+    size: 5Gi
+  bootstrap:
+    initdb:
+      database: <app>
+      owner: <app>
+```
+
+### CNPG naming conventions
+
+| Resource | Name |
+|---|---|
+| Secret with credentials | `<cluster-name>-app` |
+| Read-write service | `<cluster-name>-rw` |
+| Read-only service | `<cluster-name>-r` |
+| Read service (any) | `<cluster-name>-ro` |
+
+The secret `<cluster-name>-app` contains keys: `username`, `password`, `host`, `port`, `dbname`, `uri`. Inject into the app deployment via `secretKeyRef`:
+
+```yaml
+- name: DB_USER
+  valueFrom:
+    secretKeyRef:
+      name: <app>-db-app
+      key: username
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: <app>-db-app
+      key: password
+```
+
+Set `DBHOST` to `<app>-db-rw` (the write service, in the same namespace).
+
+### Startup ordering
+
+CNPG takes ~30–60s to bootstrap a new cluster. The application pod will crashloop until the DB secret exists and the cluster is ready. This is expected — Kubernetes will restart the pod automatically. No sync-wave or init-container is required for typical apps. Increase `initialDelaySeconds` on the readinessProbe if the app takes time to run migrations.
+
+### Validate cluster health
+
+```bash
+kubectl get cluster -n <namespace>
+kubectl describe cluster <app>-db -n <namespace>
+```
 
 ## VPN Sidecar Pattern (Gluetun)
 
