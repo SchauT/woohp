@@ -1,7 +1,7 @@
 image:
   repository: ghcr.io/paperless-ngx/paperless-ngx
   pullPolicy: IfNotPresent
-  tag: "2.14.7"
+  tag: "2.20.15"
 
 containerPort: 8000
 
