@@ -1,0 +1,76 @@
+image:
+  repository: ghcr.io/paperless-ngx/paperless-ngx
+  pullPolicy: IfNotPresent
+  tag: "2.14.7"
+
+containerPort: 8000
+
+env:
+  TZ: "Europe/Paris"
+  ocrLanguage: "fra+eng"
+  # The URL users access Paperless at (Tailscale)
+  url: "https://paperless.raccoon-pence.ts.net"
+
+# Initial admin credentials (used only on first bootstrap)
+# Change the password after first login
+admin:
+  user: "admin"
+  password: "changeme"
+
+# Secret key for Django – change this to a random string before deploying
+secretKey: "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_KEY"
+
+cnpg:
+  instances: 1
+  storage:
+    storageClass: longhorn
+    size: 5Gi
+
+redis:
+  image: redis:7-alpine
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: "200m"
+      memory: 128Mi
+
+persistence:
+  data:
+    storageClass: longhorn
+    size: 1Gi
+  media:
+    storageClass: longhorn
+    size: 20Gi
+  consume:
+    storageClass: longhorn
+    size: 2Gi
+  export:
+    storageClass: longhorn
+    size: 2Gi
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  className: tailscale
+  hosts:
+    - host: paperless
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - paperless
+      secretName: paperless-tls
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: "2"
+    memory: 2Gi

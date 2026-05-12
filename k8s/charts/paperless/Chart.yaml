@@ -1,0 +1,6 @@
+apiVersion: v2
+name: paperless
+description: Paperless-ngx document management system
+type: application
+version: 1.0.0
+appVersion: "2.14.7"

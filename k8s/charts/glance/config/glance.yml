@@ -92,6 +92,10 @@ pages:
                 url: https://seerr.raccoon-pence.ts.net/
                 check-url: http://seerr.media.svc.woohp.local:5055
                 icon: si:octopusdeploy
+              - title: Paperless
+                url: https://paperless.raccoon-pence.ts.net/
+                check-url: http://paperless.paperless.svc.woohp.local:8000
+                icon: si:paperlessngx
 
           - $include: random-duck.yml
 

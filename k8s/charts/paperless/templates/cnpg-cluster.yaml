@@ -1,0 +1,15 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: paperless-db
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+spec:
+  instances: {{ .Values.cnpg.instances }}
+  storage:
+    storageClass: {{ .Values.cnpg.storage.storageClass }}
+    size: {{ .Values.cnpg.storage.size }}
+  bootstrap:
+    initdb:
+      database: paperless
+      owner: paperless

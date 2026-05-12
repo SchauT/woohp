@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "paperless.fullname" . }}-export
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.persistence.export.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.export.size }}
