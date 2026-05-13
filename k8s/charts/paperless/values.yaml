@@ -27,7 +27,7 @@ cnpg:
     size: 5Gi
 
 redis:
-  image: redis:7-alpine
+  image: redis:8-alpine
   resources:
     requests:
       cpu: 50m
