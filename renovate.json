@@ -10,36 +10,24 @@
     "renovate"
   ],
   "helmv3": {
-    "managerFilePatterns": [
-      "/k8s/charts/.+/Chart\\.yaml$/"
-    ]
+    "managerFilePatterns": ["/k8s/charts/.+/Chart\\.yaml$/"]
   },
   "helm-values": {
-    "managerFilePatterns": [
-      "/k8s/charts/.+/values\\.yaml$/"
-    ]
+    "managerFilePatterns": ["/k8s/charts/.+/values\\.yaml$/"]
   },
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "/talos/talconfig\\.yaml$/"
-      ],
-      "matchStrings": [
-        "talosVersion:\\s*(?<currentValue>v[\\d.]+)"
-      ],
+      "managerFilePatterns": ["/talos/talconfig\\.yaml$/"],
+      "matchStrings": ["talosVersion:\\s*(?<currentValue>v[\\d.]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "siderolabs/talos",
       "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "/talos/talconfig\\.yaml$/"
-      ],
-      "matchStrings": [
-        "kubernetesVersion:\\s*(?<currentValue>v[\\d.]+)"
-      ],
+      "managerFilePatterns": ["/talos/talconfig\\.yaml$/"],
+      "matchStrings": ["kubernetesVersion:\\s*(?<currentValue>v[\\d.]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "kubernetes/kubernetes",
       "versioningTemplate": "semver"
@@ -47,28 +35,26 @@
   ],
   "packageRules": [
     {
+      "description": "Automerge patch updates except for Talos and K8s",
+      "matchUpdateTypes": ["patch"],
+      "matchPackageNames": ["!siderolabs/talos", "!kubernetes/kubernetes"],
+      "automerge": true
+    },
+    {
       "groupName": "Helm chart dependencies",
-      "matchManagers": [
-        "helmv3"
-      ]
+      "matchManagers": ["helmv3"]
     },
     {
       "groupName": "Container images",
-      "matchManagers": [
-        "helm-values"
-      ]
+      "matchManagers": ["helm-values"]
     },
     {
       "groupName": "Talos Linux",
-      "matchPackageNames": [
-        "siderolabs/talos"
-      ]
+      "matchPackageNames": ["siderolabs/talos"]
     },
     {
       "groupName": "Kubernetes",
-      "matchPackageNames": [
-        "kubernetes/kubernetes"
-      ]
+      "matchPackageNames": ["kubernetes/kubernetes"]
     },
     {
       "groupName": "Talos + Kubernetes",
