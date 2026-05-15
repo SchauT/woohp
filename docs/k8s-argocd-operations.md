@@ -34,19 +34,35 @@ kubectl describe application argocd -n argocd
 
 ## Secrets Workflow
 
-Kubernetes secret files matching `k8s/charts/*/secrets.yaml` are encrypted with SOPS (see `k8s/.sops.yaml`).
+> **This repository is public.** Never commit any secret, credential, token, or private key in plaintext. SOPS encryption is mandatory before any `git add`.
 
-Encrypt in place:
+Kubernetes secret files matching `k8s/charts/*/secrets.yaml` are encrypted with SOPS (see `k8s/.sops.yaml`). The `.sops.yaml` creation rule applies automatically to any file at that path.
+
+Encrypt a new secrets file in place:
 
 ```bash
 sops -e -i k8s/charts/<app>/secrets.yaml
 ```
 
-Edit encrypted file safely:
+Edit an encrypted file safely (decrypts in memory, re-encrypts on save):
 
 ```bash
 sops k8s/charts/<app>/secrets.yaml
 ```
+
+Reference the encrypted file from the ArgoCD Application manifest via `helm.valueFiles`:
+
+```yaml
+spec:
+  source:
+    helm:
+      releaseName: <app>
+      valueFiles:
+        - values.yaml
+        - secrets.yaml   # decrypted in-memory by helm-secrets at render time
+```
+
+The ArgoCD repo-server uses helm-secrets + the age key mounted from the `sops-age-key` secret to decrypt at render time. The plaintext values are never written to disk or stored in git.
 
 ## Add a New Application
 
@@ -204,12 +220,28 @@ For apps mounting NFS shares from the TrueNAS NAS (`192.168.1.110:/mnt/default/w
 
 Mismatched UID/GID causes permission-denied errors on files written to the NFS share even when the pod starts cleanly.
 
+## Service Name / Environment Variable Collision
+
+Kubernetes automatically injects `<SERVICE_NAME>_PORT=tcp://<ip>:<port>` (and related vars) into all pods in the same namespace via service links. If an application reads an env var whose prefix matches the Service name, it receives a URL instead of the expected value and crashes.
+
+Example: a Service named `paperless` causes Kubernetes to inject `PAPERLESS_PORT=tcp://10.x.x.x:8000`. Paperless-ngx reads `PAPERLESS_PORT` as an integer for gunicorn → crash with `'tcp://...' is not a valid port number`.
+
+Fix: add `enableServiceLinks: false` to the pod spec:
+
+```yaml
+spec:
+  enableServiceLinks: false
+  containers:
+    ...
+```
+
+This suppresses all service-derived env var injection for that pod. Apply it to any app whose name overlaps with its own env var namespace.
+
 ## Chart and Repo Conventions
 
 - Helm dependency archives (`*.tgz`) are not tracked.
 - `Chart.lock` is not tracked.
 - Generated `template.yml` snapshots can exist but should not be treated as authoritative source.
-- Secrets must stay encrypted in git.
 
 ## Troubleshooting
 
