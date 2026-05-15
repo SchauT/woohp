@@ -52,13 +52,15 @@ spec:
                 secretKeyRef:
                   name: paperless-db-app
                   key: password
-            {{- if .Values.admin.user }}
+            {{- with .Values.admin }}
+            {{- if .user }}
             - name: PAPERLESS_ADMIN_USER
-              value: {{ .Values.admin.user | quote }}
+              value: {{ .user | quote }}
             {{- end }}
-            {{- if .Values.admin.password }}
+            {{- if .password }}
             - name: PAPERLESS_ADMIN_PASSWORD
-              value: {{ .Values.admin.password | quote }}
+              value: {{ .password | quote }}
+            {{- end }}
             {{- end }}
           ports:
             - name: http
