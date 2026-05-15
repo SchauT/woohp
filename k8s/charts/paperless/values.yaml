@@ -11,15 +11,6 @@ env:
   # The URL users access Paperless at (Tailscale)
   url: "https://paperless.raccoon-pence.ts.net"
 
-# Initial admin credentials (used only on first bootstrap)
-# Change the password after first login
-admin:
-  user: "admin"
-  password: "changeme"
-
-# Secret key for Django – change this to a random string before deploying
-secretKey: "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_KEY"
-
 cnpg:
   instances: 1
   storage:

@@ -52,10 +52,14 @@ spec:
                 secretKeyRef:
                   name: paperless-db-app
                   key: password
+            {{- if .Values.admin.user }}
             - name: PAPERLESS_ADMIN_USER
               value: {{ .Values.admin.user | quote }}
+            {{- end }}
+            {{- if .Values.admin.password }}
             - name: PAPERLESS_ADMIN_PASSWORD
               value: {{ .Values.admin.password | quote }}
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.containerPort }}
