@@ -10,6 +10,6 @@ spec:
     - port: {{ .Values.gluetun.controlPort }}
       targetPort: {{ .Values.gluetun.controlPort }}
       protocol: TCP
-      name: control
+      name: http
   selector:
     {{- include "qbittorrent.selectorLabels" . | nindent 4 }}
