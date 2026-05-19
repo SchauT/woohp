@@ -13,6 +13,9 @@ spec:
     path: k8s/charts/glance
     helm:
       releaseName: glance
+      valueFiles:
+        - values.yaml
+        - secrets.yaml
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: default
