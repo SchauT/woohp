@@ -46,6 +46,11 @@ pages:
 
       - size: full
         widgets:
+          - type: split-column
+            max-columns: 2
+            widgets:
+              - $include: gluetun-vpn-status.yml
+
           - type: monitor
             cache: 1m
             title: Services
@@ -90,7 +95,7 @@ pages:
                 icon: si:jellyfin
               - title: Seerr
                 url: https://seerr.raccoon-pence.ts.net/
-                check-url: http://seerr.media.svc.woohp.local:5055
+                check-url: http://seerr-seerr-chart.media.svc.woohp.local:5055
                 icon: si:octopusdeploy
               - title: Paperless
                 url: https://paperless.raccoon-pence.ts.net/
