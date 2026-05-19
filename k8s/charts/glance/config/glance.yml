@@ -50,6 +50,7 @@ pages:
             max-columns: 2
             widgets:
               - $include: gluetun-vpn-status.yml
+              - $include: truenas-pools.yml
 
           - type: monitor
             cache: 1m
