@@ -115,6 +115,8 @@ pages:
 
       - size: small
         widgets:
+          - include: qbittorrent-stats.yml
+
           - type: search
             search-engine: duckduckgo
             bangs:
@@ -128,24 +130,10 @@ pages:
                 shortcut: "!dh"
                 url: https://hub.docker.com/search\?q\=\{QUERY\}
 
+          - type: to-do
+
           - type: bookmarks
             groups:
-              - title: Entertainment
-                color: 10 70 50
-                links:
-                  - title: Netflix
-                    url: https://www.netflix.com/
-                    icon: si:netflix
-                  - title: Disney+
-                    url: https://www.disneyplus.com/
-                    icon: si:disney
-                  - title: YouTube
-                    url: https://www.youtube.com/
-                    icon: si:youtube
-                  - title: Prime Video
-                    url: https://www.primevideo.com/
-                    icon: si:amazon
-
               - title: Quick Links
                 links:
                   - title: GitHub
@@ -164,7 +152,21 @@ pages:
                     url: https://account.protonvpn.com/dashboardV2
                     icon: si:proton
 
-          - type: to-do
+              - title: Entertainment
+                color: 10 70 50
+                links:
+                  - title: Netflix
+                    url: https://www.netflix.com/
+                    icon: si:netflix
+                  - title: Disney+
+                    url: https://www.disneyplus.com/
+                    icon: si:disney
+                  - title: YouTube
+                    url: https://www.youtube.com/
+                    icon: si:youtube
+                  - title: Prime Video
+                    url: https://www.primevideo.com/
+                    icon: si:amazon
 
   - name: News & Feeds
     columns:
