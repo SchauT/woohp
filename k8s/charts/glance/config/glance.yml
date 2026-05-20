@@ -109,6 +109,8 @@ pages:
                 check-url: http://paperless.paperless.svc.woohp.local:8000
                 icon: si:paperlessngx
 
+          - $include: jellyfin-playing.yml
+
           - $include: random-duck.yml
 
       - size: small
