@@ -1,0 +1,78 @@
+- type: custom-api
+  title: Seerr Requests
+  title-url: https://seerr.raccoon-pence.ts.net/requests
+  url: http://seerr-seerr-chart.media.svc.woohp.local/api/v1/request/count
+  cache: 10m
+  options:
+    small-column: false
+    compact: true
+  headers:
+    accept: "application/json"
+    x-api-key: ${SEERR_API_KEY}
+  template: |
+    {{ $isSmallColumn := .Options.BoolOr "small-column" false }}
+    {{ $isCompact := .Options.BoolOr "compact" false }}
+
+    {{ if eq .Response.StatusCode 200 }}
+      {{ if $isSmallColumn }}
+        <ul class="list list-gap-10 collapsible-container" data-collapse-after="3">
+          <li class="flex items-start gap-10">
+            <div class="flex-1 size-h3 {{ if $isCompact }}size-h5{{ end }}">Total</div>
+            <div class="flex-1 color-highlight shrink-0 text-right size-h3 {{ if $isCompact }}size-h5{{ end }}">
+              {{ .JSON.Int "total" | formatNumber }}
+            </div>
+          </li>
+          <li class="flex items-start gap-10">
+            <div class="flex-1 size-h3 {{ if $isCompact }}size-h5{{ end }}">Movies</div>
+            <div class="flex-1 color-highlight shrink-0 text-right size-h3 {{ if $isCompact }}size-h5{{ end }}">
+              {{ .JSON.Int "movie" | formatNumber }}
+            </div>
+          </li>
+          <li class="flex items-start gap-10">
+            <div class="flex-1 size-h3 {{ if $isCompact }}size-h5{{ end }}">TV Series</div>
+            <div class="flex-1 color-highlight shrink-0 text-right size-h3 {{ if $isCompact }}size-h5{{ end }}">
+              {{ .JSON.Int "tv" | formatNumber }}
+            </div>
+          </li>
+          <li class="flex items-start gap-10">
+            <div class="flex-1 size-h3 {{ if $isCompact }}size-h5{{ end }}">Pending</div>
+            <div class="flex-1 color-highlight shrink-0 text-right size-h3 {{ if $isCompact }}size-h5{{ end }}">
+              {{ .JSON.Int "pending" | formatNumber }}
+            </div>
+          </li>
+          <li class="flex items-start gap-10">
+            <div class="flex-1 size-h3 {{ if $isCompact }}size-h5{{ end }}">Approved</div>
+            <div class="flex-1 color-highlight shrink-0 text-right size-h3 {{ if $isCompact }}size-h5{{ end }}">
+              {{ .JSON.Int "approved" | formatNumber }}
+            </div>
+          </li>
+        </ul>
+      {{ else }}
+        <div class="flex justify-evenly text-center">
+          <div>
+              <div class="color-highlight size-h1 {{ if $isCompact }}size-h3{{ end }}">{{ .JSON.Int "total" | formatNumber }}</div>
+              <div class="size-h3 {{ if $isCompact }}size-h5{{ end }}">Total</div>
+          </div>
+          <div>
+              <div class="color-highlight size-h1 {{ if $isCompact }}size-h3{{ end }}">{{ .JSON.Int "movie" | formatNumber }}</div>
+              <div class="size-h3 {{ if $isCompact }}size-h5{{ end }}">Movies</div>
+          </div>
+          <div>
+              <div class="color-highlight size-h1 {{ if $isCompact }}size-h3{{ end }}">{{ .JSON.Int "tv" | formatNumber }}</div>
+              <div class="size-h3 {{ if $isCompact }}size-h5{{ end }}">TV Series</div>
+          </div>
+        {{ if not $isCompact }}
+          </div>
+          <div class="flex justify-evenly text-center margin-top-20">
+        {{ end }}
+          <div>
+              <div class="color-highlight size-h1 {{ if $isCompact }}size-h3{{ end }}">{{ .JSON.Int "pending" | formatNumber }}</div>
+              <div class="size-h3 {{ if $isCompact }}size-h5{{ end }}">Pending</div>
+          </div>
+          <div>
+              <div class="color-highlight size-h1 {{ if $isCompact }}size-h3{{ end }}">{{ .JSON.Int "approved" | formatNumber }}</div>
+              <div class="size-h3 {{ if $isCompact }}size-h5{{ end }}">Approved</div>
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}

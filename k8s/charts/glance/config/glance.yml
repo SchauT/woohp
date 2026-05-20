@@ -49,6 +49,12 @@ pages:
           - type: split-column
             max-columns: 2
             widgets:
+              - $include: jellyfin-stats.yml
+              - $include: seerr-stats.yml
+
+          - type: split-column
+            max-columns: 2
+            widgets:
               - $include: gluetun-vpn-status.yml
               - $include: truenas-pools.yml
 
