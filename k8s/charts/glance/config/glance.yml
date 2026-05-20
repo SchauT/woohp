@@ -67,19 +67,19 @@ pages:
                 check-url: http://argocd-server.argocd.svc.woohp.local
                 allow-insecure: true
                 icon: si:argo
+              - title: Longhorn
+                url: https://longhorn.raccoon-pence.ts.net/#/dashboard
+                check-url: http://longhorn-frontend.longhorn-system.svc.woohp.local
+                icon: si:longhorn
               - title: TrueNAS
                 url: http://192.168.1.110
                 check-url: http://192.168.1.110
                 allow-insecure: true
                 icon: si:truenas
-              - title: Longhorn
-                url: https://longhorn.raccoon-pence.ts.net/#/dashboard
-                check-url: http://longhorn-frontend.longhorn-system.svc.woohp.local
-                icon: si:longhorn
-              - title: QBittorrent
-                url: https://qbittorrent.raccoon-pence.ts.net/
-                check-url: http://qbittorrent.media.svc.woohp.local:8200
-                icon: si:qbittorrent
+              - title: Jellyfin
+                url: https://jellyfin.raccoon-pence.ts.net/
+                check-url: http://jellyfin.media.svc.woohp.local:8096
+                icon: si:jellyfin
               - title: Sonarr
                 url: https://sonarr.raccoon-pence.ts.net/
                 check-url: http://sonarr.media.svc.woohp.local:8989
@@ -88,6 +88,10 @@ pages:
                 url: https://radarr.raccoon-pence.ts.net/
                 check-url: http://radarr.media.svc.woohp.local:7878
                 icon: si:radarr
+              - title: Seerr
+                url: https://seerr.raccoon-pence.ts.net/
+                check-url: http://seerr-seerr-chart.media.svc.woohp.local
+                icon: si:octopusdeploy
               - title: Prowlarr
                 url: https://prowlarr.raccoon-pence.ts.net/
                 check-url: http://prowlarr.media.svc.woohp.local:9696
@@ -96,14 +100,10 @@ pages:
                 check-url: http://flaresolverr.media.svc.woohp.local:8191
                 allow-insecure: true
                 icon: si:cloudflare
-              - title: Jellyfin
-                url: https://jellyfin.raccoon-pence.ts.net/
-                check-url: http://jellyfin.media.svc.woohp.local:8096
-                icon: si:jellyfin
-              - title: Seerr
-                url: https://seerr.raccoon-pence.ts.net/
-                check-url: http://seerr-seerr-chart.media.svc.woohp.local
-                icon: si:octopusdeploy
+              - title: QBittorrent
+                url: https://qbittorrent.raccoon-pence.ts.net/
+                check-url: http://qbittorrent.media.svc.woohp.local:8200
+                icon: si:qbittorrent
               - title: Paperless
                 url: https://paperless.raccoon-pence.ts.net/
                 check-url: http://paperless.paperless.svc.woohp.local:8000
