@@ -115,7 +115,7 @@ pages:
 
       - size: small
         widgets:
-          - include: qbittorrent-stats.yml
+          - $include: qbittorrent-stats.yml
 
           - type: search
             search-engine: duckduckgo
