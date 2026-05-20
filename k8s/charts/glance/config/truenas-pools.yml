@@ -3,12 +3,12 @@
   cache: 1m
   template: |
     {{
-      $dataset := newRequest "${TRUENAS_HOST}/api/v2.0/pool/dataset"
+      $dataset := newRequest "http://${TRUENAS_HOST}/api/v2.0/pool/dataset"
         | withHeader "Authorization" "Bearer ${TRUENAS_API_KEY}"
         | getResponse
     }}
     {{
-      $pool := newRequest "${TRUENAS_HOST}/api/v2.0/pool"
+      $pool := newRequest "http://${TRUENAS_HOST}/api/v2.0/pool"
         | withHeader "Authorization" "Bearer ${TRUENAS_API_KEY}"
         | getResponse
     }}
