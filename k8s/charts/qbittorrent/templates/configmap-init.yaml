@@ -65,23 +65,52 @@ data:
     mv "$BASE" "$CONF"
   02-port-sync.sh: |
     #!/bin/sh
-    # Watches /tmp/gluetun/forwarded_port and syncs Gluetun's ProtonVPN
-    # forwarded port to qBittorrent's listen port via the Web API.
+    # Syncs Gluetun's ProtonVPN forwarded port to qBittorrent's listen port.
+    # Also detects when port forwarding is stuck (file empty too long) and
+    # resets the VPN connection via the Gluetun API to trigger a fresh NAT-PMP
+    # negotiation — without restarting the container.
     # Runs as a background daemon so the container init completes immediately.
 
+    GLUETUN_API="http://localhost:{{ .Values.gluetun.controlPort }}"
     QBT_API="http://localhost:{{ .Values.webuiPort }}/api/v2"
     PORT_FILE="/tmp/gluetun/forwarded_port"
     STATE_FILE="/tmp/qbt-synced-port"
+    EMPTY_SINCE_FILE="/tmp/port-empty-since"
     INTERVAL=20
+    # Seconds without a forwarded port before we restart the VPN connection
+    VPN_RESET_TIMEOUT=300
 
     _sync() {
       PORT=$(cat "$PORT_FILE" 2>/dev/null | tr -d '[:space:]')
-      [ -z "$PORT" ] && return
+
+      if [ -z "$PORT" ]; then
+        # File is empty: start tracking how long it has been empty
+        if [ ! -f "$EMPTY_SINCE_FILE" ]; then
+          date +%s > "$EMPTY_SINCE_FILE"
+          echo "[port-sync] Port file empty, watching..."
+          return
+        fi
+        ELAPSED=$(( $(date +%s) - $(cat "$EMPTY_SINCE_FILE") ))
+        if [ "$ELAPSED" -ge "$VPN_RESET_TIMEOUT" ]; then
+          echo "[port-sync] Port file empty for ${ELAPSED}s — restarting VPN via Gluetun API"
+          curl -sf -X PUT -H "Content-Type: application/json" \
+            -d '{"status":"stopped"}' "${GLUETUN_API}/v1/vpn/status" && \
+          sleep 5 && \
+          curl -sf -X PUT -H "Content-Type: application/json" \
+            -d '{"status":"running"}' "${GLUETUN_API}/v1/vpn/status"
+          rm -f "$EMPTY_SINCE_FILE"
+        fi
+        return
+      fi
+
+      # Port file has content: reset the empty-since tracker
+      rm -f "$EMPTY_SINCE_FILE"
+
       PREV=$(cat "$STATE_FILE" 2>/dev/null)
       [ "$PORT" = "$PREV" ] && return
-      if wget -qO- \
-          --post-data "json={\"listen_port\":${PORT}}" \
-          "${QBT_API}/app/setPreferences" > /dev/null 2>&1; then
+
+      if curl -sf -X POST "${QBT_API}/app/setPreferences" \
+          -d "json={\"listen_port\":${PORT}}" > /dev/null; then
         echo "$PORT" > "$STATE_FILE"
         echo "[port-sync] Updated qBittorrent listen port to ${PORT}"
       fi
