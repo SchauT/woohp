@@ -191,6 +191,36 @@ WireGuard credentials (private key, addresses) live in a SOPS-encrypted `secrets
 
 **Pitfall — Gluetun auth (v3.39.1+)**: The HTTP control server requires authentication by default since v3.39.1. Without `HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE: '{"auth":"none"}'`, readiness probes to `/v1/vpn/status` return 401 and the pod never becomes ready. The deprecated endpoint `/v1/openvpn/status` was removed; always use `/v1/vpn/status`.
 
+**Pitfall — ProtonVPN NAT-PMP lease resets**: ProtonVPN renews port-forwarding leases via NAT-PMP (UDP 5351) every ~90 seconds. The server occasionally resets, causing `connection refused` errors in Gluetun logs. Gluetun recovers automatically (clears the old port, requests a new one), but the new port must be propagated to the application.
+
+**Pattern — dynamic port sync for qBittorrent**: Gluetun writes the current forwarded port to `/tmp/gluetun/forwarded_port`. Share that path between containers via an `emptyDir` volume and use a background script in the app container to poll and update the listen port via the app's API:
+
+```yaml
+# deployment.yaml — shared emptyDir
+volumes:
+  - name: gluetun-data
+    emptyDir: {}
+# gluetun volumeMount (rw)
+  - name: gluetun-data
+    mountPath: /tmp/gluetun
+# app volumeMount (ro)
+  - name: gluetun-data
+    mountPath: /tmp/gluetun
+    readOnly: true
+```
+
+```sh
+# 02-port-sync.sh (LSIO custom-cont-init.d) — runs as background daemon
+while true; do
+  PORT=$(cat /tmp/gluetun/forwarded_port 2>/dev/null | tr -d '[:space:]')
+  [ -n "$PORT" ] && wget -qO- --post-data "json={\"listen_port\":${PORT}}" \
+    http://localhost:8200/api/v2/app/setPreferences > /dev/null 2>&1
+  sleep 20
+done &
+```
+
+The full implementation lives in `k8s/charts/qbittorrent/templates/`.
+
 ## Shared Infrastructure Chart Pattern
 
 When multiple applications in the same namespace share resources (Namespace, PersistentVolume, Secrets), create a dedicated `<namespace>-infra` chart deployed at `sync-wave: -1`.

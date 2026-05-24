@@ -62,6 +62,7 @@ kubectl get applications -n argocd
 - The age key secret `sops-age-key` must exist in namespace `argocd` before encrypted Helm value files can be decrypted by repo-server.
 - `k8s/charts/*/template.yml` files are generated snapshots and may drift; treat chart templates/manifests as source of truth.
 - Gluetun v3.39.1+ requires `HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE='{"auth":"none"}'` or readiness probes return 401. Use endpoint `/v1/vpn/status` (not the removed `/v1/openvpn/status`).
+- ProtonVPN NAT-PMP leases reset periodically; Gluetun recovers but the new port must be synced to the app. Use a shared `emptyDir` on `/tmp/gluetun` and a background script reading `forwarded_port` to push the port via the app's API. See `docs/k8s-argocd-operations.md#vpn-sidecar-pattern-gluetun`.
 - NFS-backed apps must use `PUID=3001`/`PGID=3001` (LinuxServer.io) or `runAsUser/Group/fsGroup: 3001` to match NAS dataset ownership. Mismatch causes silent permission-denied errors on writes.
 - If an app's Service has the same name as a prefix the app reads as an env var (e.g. Service `paperless` → Kubernetes injects `PAPERLESS_PORT=tcp://...`), the app crashes with an invalid port error. Fix: add `enableServiceLinks: false` to the pod spec.
 
