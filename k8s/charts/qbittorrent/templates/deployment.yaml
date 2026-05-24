@@ -72,6 +72,8 @@ spec:
           volumeMounts:
             - name: tun-device
               mountPath: /dev/net/tun
+            - name: gluetun-data
+              mountPath: /tmp/gluetun
       containers:
         - name: qbittorrent
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -118,6 +120,9 @@ spec:
               mountPath: /data
             - name: qbittorrent-init
               mountPath: /custom-cont-init.d
+            - name: gluetun-data
+              mountPath: /tmp/gluetun
+              readOnly: true
       volumes:
         - name: tun-device
           hostPath:
@@ -133,3 +138,5 @@ spec:
         - name: media-data
           persistentVolumeClaim:
             claimName: media-data
+        - name: gluetun-data
+          emptyDir: {}

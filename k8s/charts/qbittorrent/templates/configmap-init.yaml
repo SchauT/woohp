@@ -63,3 +63,31 @@ data:
     } >> "$BASE"
 
     mv "$BASE" "$CONF"
+  02-port-sync.sh: |
+    #!/bin/sh
+    # Watches /tmp/gluetun/forwarded_port and syncs Gluetun's ProtonVPN
+    # forwarded port to qBittorrent's listen port via the Web API.
+    # Runs as a background daemon so the container init completes immediately.
+
+    QBT_API="http://localhost:{{ .Values.webuiPort }}/api/v2"
+    PORT_FILE="/tmp/gluetun/forwarded_port"
+    STATE_FILE="/tmp/qbt-synced-port"
+    INTERVAL=20
+
+    _sync() {
+      PORT=$(cat "$PORT_FILE" 2>/dev/null | tr -d '[:space:]')
+      [ -z "$PORT" ] && return
+      PREV=$(cat "$STATE_FILE" 2>/dev/null)
+      [ "$PORT" = "$PREV" ] && return
+      if wget -qO- \
+          --post-data "json={\"listen_port\":${PORT}}" \
+          "${QBT_API}/app/setPreferences" > /dev/null 2>&1; then
+        echo "$PORT" > "$STATE_FILE"
+        echo "[port-sync] Updated qBittorrent listen port to ${PORT}"
+      fi
+    }
+
+    while true; do
+      _sync
+      sleep "$INTERVAL"
+    done &
