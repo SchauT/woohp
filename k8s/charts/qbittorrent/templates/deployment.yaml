@@ -65,6 +65,18 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 15
             failureThreshold: 40
+          # If the forwarded_port file stays empty after the initial grace period,
+          # the NAT-PMP lease is permanently stuck. Restart the sidecar to force
+          # a fresh WireGuard reconnection and a new port lease.
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "test -s /tmp/gluetun/forwarded_port"
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 5
           {{- with .Values.resources.gluetun }}
           resources:
             {{- toYaml . | nindent 12 }}
