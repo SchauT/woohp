@@ -76,6 +76,5 @@ Use detailed docs for operational tasks instead of expanding this file:
 ## Session Close-Out
 
 - On end-of-session intent (wrap-up, finalization, done for today), run the `session-doc-sync` skill before final response.
-- After documentation sync, run `git-commit-and-push` to review changes, create coherent commits, and request push approval.
 - Update docs only when the session introduced durable operational, architectural, workflow, or troubleshooting knowledge.
 - If no documentation update is needed, state that explicitly with a short reason.
