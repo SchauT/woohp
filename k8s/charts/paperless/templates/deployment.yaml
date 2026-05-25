@@ -30,6 +30,10 @@ spec:
               value: {{ .Values.env.url | quote }}
             - name: PAPERLESS_OCR_LANGUAGE
               value: {{ .Values.env.ocrLanguage | quote }}
+            - name: PAPERLESS_TASK_WORKERS
+              value: {{ .Values.env.taskWorkers | default "1" | quote }}
+            - name: PAPERLESS_THREADS_PER_WORKER
+              value: {{ .Values.env.threadsPerWorker | default "1" | quote }}
             - name: PAPERLESS_SECRET_KEY
               value: {{ .Values.secretKey | quote }}
             - name: PAPERLESS_REDIS

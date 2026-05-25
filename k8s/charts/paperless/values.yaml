@@ -10,6 +10,8 @@ env:
   ocrLanguage: "fra+eng"
   # The URL users access Paperless at (Tailscale)
   url: "https://paperless.raccoon-pence.ts.net"
+  taskWorkers: "1"
+  threadsPerWorker: "1"
 
 cnpg:
   instances: 1
@@ -64,4 +66,4 @@ resources:
     memory: 512Mi
   limits:
     cpu: "2"
-    memory: 2Gi
+    memory: 3Gi
