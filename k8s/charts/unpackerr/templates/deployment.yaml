@@ -29,8 +29,10 @@ spec:
               value: {{ .Values.env.TZ | quote }}
             - name: UN_RADARR_0_URL
               value: {{ .Values.radarr.url | quote }}
-            - name: UN_RADARR_0_PATHS_0
-              value: {{ index .Values.radarr.paths 0 | quote }}
+            {{- range $i, $path := .Values.radarr.paths }}
+            - name: {{ printf "UN_RADARR_0_PATHS_%d" $i }}
+              value: {{ $path | quote }}
+            {{- end }}
             - name: UN_RADARR_0_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -38,8 +40,10 @@ spec:
                   key: radarr-api-key
             - name: UN_SONARR_0_URL
               value: {{ .Values.sonarr.url | quote }}
-            - name: UN_SONARR_0_PATHS_0
-              value: {{ index .Values.sonarr.paths 0 | quote }}
+            {{- range $i, $path := .Values.sonarr.paths }}
+            - name: {{ printf "UN_SONARR_0_PATHS_%d" $i }}
+              value: {{ $path | quote }}
+            {{- end }}
             - name: UN_SONARR_0_API_KEY
               valueFrom:
                 secretKeyRef:
