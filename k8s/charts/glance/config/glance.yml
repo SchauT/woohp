@@ -104,6 +104,10 @@ pages:
                 url: https://qbittorrent.raccoon-pence.ts.net/
                 check-url: http://qbittorrent.media.svc.woohp.local:8200
                 icon: si:qbittorrent
+              - title: Bazarr
+                url: https://bazarr.raccoon-pence.ts.net/
+                check-url: http://bazarr.media.svc.woohp.local:6767
+                icon: si:bazarr
               - title: Paperless
                 url: https://paperless.raccoon-pence.ts.net/
                 check-url: http://paperless.paperless.svc.woohp.local:8000
