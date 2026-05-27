@@ -1,0 +1,34 @@
+image:
+  repository: ghcr.io/unpackerr/unpackerr
+  pullPolicy: IfNotPresent
+  tag: "0.15.2"
+
+securityContext:
+  runAsUser: 3001
+  runAsGroup: 3001
+  fsGroup: 3001
+
+env:
+  TZ: "Europe/Paris"
+
+radarr:
+  url: "http://radarr.media.svc.woohp.local:7878"
+  paths:
+    - /data/torrents/movies
+  # apiKey provided via secrets.yaml
+  apiKey: ""
+
+sonarr:
+  url: "http://sonarr.media.svc.woohp.local:8989"
+  paths:
+    - /data/torrents/tv
+  # apiKey provided via secrets.yaml
+  apiKey: ""
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi

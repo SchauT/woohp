@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "unpackerr.fullname" . }}
+  labels:
+    {{- include "unpackerr.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "unpackerr.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "unpackerr.labels" . | nindent 8 }}
+    spec:
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+      containers:
+        - name: unpackerr
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: TZ
+              value: {{ .Values.env.TZ | quote }}
+            - name: UN_RADARR_0_URL
+              value: {{ .Values.radarr.url | quote }}
+            - name: UN_RADARR_0_PATHS_0
+              value: {{ index .Values.radarr.paths 0 | quote }}
+            - name: UN_RADARR_0_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "unpackerr.fullname" . }}
+                  key: radarr-api-key
+            - name: UN_SONARR_0_URL
+              value: {{ .Values.sonarr.url | quote }}
+            - name: UN_SONARR_0_PATHS_0
+              value: {{ index .Values.sonarr.paths 0 | quote }}
+            - name: UN_SONARR_0_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "unpackerr.fullname" . }}
+                  key: sonarr-api-key
+            - name: UN_INTERVAL
+              value: "2m"
+            - name: UN_START_DELAY
+              value: "1m"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pgrep unpackerr
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: media-data
+              mountPath: /data
+      volumes:
+        - name: media-data
+          persistentVolumeClaim:
+            claimName: media-data
