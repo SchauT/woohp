@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: n8n
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/SchauT/woohp.git'
+    targetRevision: HEAD
+    path: k8s/charts/n8n
+    helm:
+      releaseName: n8n
+      valueFiles:
+        - values.yaml
+        - secrets.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: n8n
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

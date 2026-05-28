@@ -1,0 +1,67 @@
+# Umbrella chart values (used by custom templates: secret, cnpg-cluster)
+host: n8n.raccoon-pence.ts.net
+protocol: https
+port: "5678"
+
+cnpg:
+  instances: 1
+  storage:
+    storageClass: longhorn
+    size: 3Gi
+
+# Values for the upstream n8n chart (oci://ghcr.io/n8n-io/n8n-helm-chart/n8n)
+n8n:
+  queueMode:
+    enabled: false
+
+  database:
+    type: postgresdb
+    useExternal: true
+    host: n8n-db-rw
+    port: 5432
+    database: n8n
+    user: n8n
+    passwordSecret:
+      name: n8n-db-app
+      key: password
+
+  redis:
+    enabled: false
+
+  persistence:
+    enabled: false
+
+  secretRefs:
+    existingSecret: n8n-core-secrets
+
+  config:
+    timezone: Europe/Paris
+
+  webhook:
+    enabled: true
+    url: https://n8n.raccoon-pence.ts.net
+
+  service:
+    type: ClusterIP
+    port: 5678
+
+  ingress:
+    enabled: true
+    className: tailscale
+    hosts:
+      - host: n8n
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - n8n
+        secretName: n8n-tls
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
