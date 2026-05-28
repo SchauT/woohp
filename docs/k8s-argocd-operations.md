@@ -267,6 +267,82 @@ spec:
 
 This suppresses all service-derived env var injection for that pod. Apply it to any app whose name overlaps with its own env var namespace.
 
+## Umbrella Chart with OCI Dependency
+
+When wrapping an upstream chart published to an OCI registry (e.g. `oci://ghcr.io/...`), use an umbrella chart that vendors the upstream as a dependency. This is the pattern used by `seerr` and `n8n`.
+
+### Structure
+
+```
+k8s/charts/<app>/
+  Chart.yaml          # declares OCI dependency
+  values.yaml         # top-level values (custom templates) + nested <dep-name>: block (upstream values)
+  secrets.yaml        # SOPS-encrypted, referenced by ArgoCD valueFiles
+  templates/
+    _helpers.tpl
+    <custom>.yaml     # e.g. secret.yaml, cnpg-cluster.yaml
+  charts/
+    <dep>-<version>.tgz   # vendored by helm dependency update (not tracked by git)
+```
+
+### Chart.yaml pattern
+
+```yaml
+apiVersion: v2
+name: <app>
+version: 1.0.0
+dependencies:
+  - name: <chart-name>
+    version: "<semver>"
+    repository: oci://ghcr.io/<org>/<registry>
+```
+
+Run `helm dependency update k8s/charts/<app>` to pull the `.tgz`. Re-run after any version bump in `Chart.yaml`.
+
+### values.yaml layout
+
+Top-level keys are consumed by custom umbrella templates. Upstream chart values are nested under the dependency name:
+
+```yaml
+# consumed by umbrella templates (e.g. secret.yaml, cnpg-cluster.yaml)
+host: myapp.raccoon-pence.ts.net
+protocol: https
+port: "8080"
+
+# consumed by the upstream chart
+<dep-name>:
+  ingress:
+    enabled: true
+    ...
+```
+
+### Injecting secrets required by upstream chart
+
+When the upstream chart reads secrets via `secretRefs.existingSecret`, create the K8s Secret in a custom umbrella template (`templates/secret.yaml`) sourcing values from the SOPS-encrypted `secrets.yaml`:
+
+```yaml
+# templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: <app>-core-secrets
+stringData:
+  SOME_KEY: {{ .Values.someKey | quote }}
+```
+
+Then point the upstream chart at it:
+
+```yaml
+# values.yaml, under the <dep-name>: block
+<dep-name>:
+  secretRefs:
+    existingSecret: <app>-core-secrets
+```
+
+### Vendoring and gitignore
+
+`Chart.lock` and `charts/*.tgz` are excluded by `.gitignore`. Only `Chart.yaml`, `values.yaml`, `secrets.yaml`, and `templates/` are tracked.
+
 ## Chart and Repo Conventions
 
 - Helm dependency archives (`*.tgz`) are not tracked.

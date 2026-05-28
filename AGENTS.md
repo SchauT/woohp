@@ -56,6 +56,16 @@ kubectl get applications -n argocd
 - New app pattern: add chart under `k8s/charts/<app>/` and corresponding ArgoCD app in `k8s/apps/<app>.yaml`. If the app has a web UI, add a monitor entry to `k8s/charts/glance/config/glance.yml` (see `docs/k8s-argocd-operations.md#add-service-monitor-to-glance-dashboard`).
 - Do not commit local-sensitive/generated files: `.envrc`, `woohp-kubeconfig`, `*.bak`, `Chart.lock`, Helm dependency archives.
 
+## Planning Convention
+
+Before implementing any non-trivial task, produce a plan with these three sections:
+
+1. **Why** — goal, motivation, or constraint driving the work.
+2. **How** — technical approach: files to create/modify, architecture decisions, patterns used, order of operations.
+3. **Validation criteria** — explicit, observable checks that must all pass before the session is considered successful (e.g. `kubectl` commands, HTTP probes, ArgoCD health, browser access).
+
+Do not start implementation until the plan is confirmed. Do not close a session until every validation criterion has been checked and has passed.
+
 ## Pitfalls
 
 - `talos/gen_and_apply_conf_to_all_nodes.sh` is interactive and can apply live node config changes. Review diffs carefully before confirming.
