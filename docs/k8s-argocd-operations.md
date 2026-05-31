@@ -371,3 +371,30 @@ kubectl logs deploy/argocd-repo-server -n argocd
 - File path in ArgoCD chart still matches mounted key path
 
 If ArgoCD cannot decrypt values, start by validating `k8s/charts/argocd/values.yaml` repo-server env and mounts.
+
+## Resizing a Longhorn PVC
+
+Longhorn supports online volume expansion (`allowVolumeExpansion: true`). The filesystem resize requires a pod restart.
+
+**Why not ArgoCD sync alone?** Helm does not patch existing PVCs on `helm upgrade` — PVCs are treated as persistent resources to avoid data loss. ArgoCD will show the PVC as OutOfSync but will not act on it. The `kubectl patch` is always required; ArgoCD cannot replace it.
+
+1. Update `size` in the app's `values.yaml` to keep the Git state consistent.
+2. Commit and push the `values.yaml` change.
+3. Patch the PVC directly:
+   ```bash
+   kubectl patch pvc <pvc-name> -n <namespace> -p '{"spec":{"resources":{"requests":{"storage":"<new-size>"}}}}'
+   ```
+4. Verify the PVC shows `FileSystemResizePending`:
+   ```bash
+   kubectl describe pvc <pvc-name> -n <namespace>
+   ```
+5. Restart the pod to trigger filesystem resize:
+   ```bash
+   kubectl rollout restart deployment/<app> -n <namespace>
+   ```
+6. Confirm new capacity:
+   ```bash
+   kubectl exec -n <namespace> deploy/<app> -- df -h
+   ```
+
+**Pitfall**: the PVC `Capacity` field in `kubectl get pvc` does not update until after the pod restarts and the filesystem is resized. Do not assume the resize failed if the capacity still shows the old value before the restart.
