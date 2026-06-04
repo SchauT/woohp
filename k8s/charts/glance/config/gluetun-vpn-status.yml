@@ -1,26 +1,22 @@
 - type: custom-api
   title: Gluetun status
   cache: 1m
-  url: http://gluetun.media.svc.woohp.local:8320/v1/publicip/ip
+  url: http://gluetun.media.svc.woohp.local:8320/v1/vpn/status
   options:
     show-forwarded-port: true
   template: |
     {{ if eq .Response.StatusCode 200 }}
-      {{ $ip := (.JSON.String "public_ip") }}
-      {{ $city := (.JSON.String "city") }}
-      {{ $country := (.JSON.String "country") }}
-      {{ if eq $ip "" }}
-        <div>
-          <div>
-            <div>
-              <div class="color-highlight size-h3">
-                Your VPN is not connected!
-                <span class="color-negative">●</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      {{ else }}
+      {{ $status := (.JSON.String "status") }}
+      {{ if eq $status "running" }}
+        {{ $ipResp := newRequest "http://gluetun.media.svc.woohp.local:8320/v1/publicip/ip" | getResponse }}
+        {{ $ip := "" }}
+        {{ $city := "" }}
+        {{ $country := "" }}
+        {{ if eq $ipResp.Response.StatusCode 200 }}
+          {{ $ip = ($ipResp.JSON.String "public_ip") }}
+          {{ $city = ($ipResp.JSON.String "city") }}
+          {{ $country = ($ipResp.JSON.String "country") }}
+        {{ end }}
         <div>
           <div>
             <div>
@@ -29,7 +25,20 @@
                 <span class="color-positive">●</span>
               </div>
             </div>
-            <div class="size-h5">{{ $ip }} - {{ $city }}, {{ $country }}</div>
+            {{ if ne $ip "" }}
+              <div class="size-h5">{{ $ip }} - {{ $city }}, {{ $country }}</div>
+            {{ end }}
+          </div>
+        </div>
+      {{ else }}
+        <div>
+          <div>
+            <div>
+              <div class="color-highlight size-h3">
+                Your VPN is not connected!
+                <span class="color-negative">●</span>
+              </div>
+            </div>
           </div>
         </div>
       {{ end }}
