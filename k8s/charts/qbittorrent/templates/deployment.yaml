@@ -48,11 +48,11 @@ spec:
             # (safe: port is only accessible within the pod)
             - name: HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE
               value: '{"auth":"none"}'
-            # Disable periodic public IP refresh — external lookup services are
-            # rate-limited/blocked from the ProtonVPN exit IP. The IP fetched at
-            # startup is correct and remains valid until Gluetun reconnects.
+            # Long public IP refresh period — external lookup services are
+            # rate-limited/blocked from the ProtonVPN exit IP. Fetches once at
+            # startup (correct) and effectively never refreshes.
             - name: PUBLICIP_PERIOD
-              value: "0"
+              value: "8760h"
             - name: WIREGUARD_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
