@@ -3,7 +3,6 @@ name: seerr
 description: Seerr media request manager
 type: application
 version: 1.0.0
-appVersion: "v3.2.0"
 dependencies:
   - name: seerr-chart
     version: 3.7.0
