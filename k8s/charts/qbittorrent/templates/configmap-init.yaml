@@ -66,25 +66,57 @@ data:
   02-port-sync.sh: |
     #!/bin/sh
     # Syncs Gluetun's ProtonVPN forwarded port to qBittorrent's listen port.
-    # Also detects when port forwarding is stuck (file empty too long) and
-    # resets the VPN connection via the Gluetun API to trigger a fresh NAT-PMP
-    # negotiation — without restarting the container.
+    # Also detects when the VPN is crashed/stopped or port forwarding is stuck,
+    # and resets the VPN connection via the Gluetun API — without restarting
+    # the container.
     # Runs as a background daemon so the container init completes immediately.
 
     GLUETUN_API="http://localhost:{{ .Values.gluetun.controlPort }}"
     QBT_API="http://localhost:{{ .Values.webuiPort }}/api/v2"
     PORT_FILE="/tmp/gluetun/forwarded_port"
     STATE_FILE="/tmp/qbt-synced-port"
+    # Tracks how long the VPN has been in a non-running state (crashed/stopped)
+    UNHEALTHY_SINCE_FILE="/tmp/vpn-unhealthy-since"
+    # Tracks how long the forwarded_port file has been empty while VPN is up
     EMPTY_SINCE_FILE="/tmp/port-empty-since"
-    INTERVAL=20
-    # Seconds without a forwarded port before we restart the VPN connection
+    INTERVAL=30
+    # Seconds in a non-running or port-less state before forcing a VPN restart
     VPN_RESET_TIMEOUT=300
 
     _sync() {
+      # --- Check VPN health directly via the Gluetun control API ---
+      # This catches crashed/stopped states that do NOT clear the port file,
+      # which previously made the heal logic blind to the crash.
+      VPN_STATUS=$(wget -qO- "${GLUETUN_API}/v1/vpn/status" 2>/dev/null \
+        | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+
+      if [ "$VPN_STATUS" != "running" ]; then
+        rm -f "$EMPTY_SINCE_FILE"
+        if [ ! -f "$UNHEALTHY_SINCE_FILE" ]; then
+          date +%s > "$UNHEALTHY_SINCE_FILE"
+          echo "[port-sync] VPN status='${VPN_STATUS}', watching..."
+          return
+        fi
+        ELAPSED=$(( $(date +%s) - $(cat "$UNHEALTHY_SINCE_FILE") ))
+        if [ "$ELAPSED" -ge "$VPN_RESET_TIMEOUT" ]; then
+          echo "[port-sync] VPN not running for ${ELAPSED}s — restarting via Gluetun API"
+          curl -sf -X PUT -H "Content-Type: application/json" \
+            -d '{"status":"stopped"}' "${GLUETUN_API}/v1/vpn/status"
+          sleep 5
+          curl -sf -X PUT -H "Content-Type: application/json" \
+            -d '{"status":"running"}' "${GLUETUN_API}/v1/vpn/status"
+          rm -f "$UNHEALTHY_SINCE_FILE"
+        fi
+        return
+      fi
+
+      # VPN is running: reset the unhealthy tracker
+      rm -f "$UNHEALTHY_SINCE_FILE"
+
       PORT=$(cat "$PORT_FILE" 2>/dev/null | tr -d '[:space:]')
 
       if [ -z "$PORT" ]; then
-        # File is empty: start tracking how long it has been empty
+        # Port forwarding not yet active despite VPN being up
         if [ ! -f "$EMPTY_SINCE_FILE" ]; then
           date +%s > "$EMPTY_SINCE_FILE"
           echo "[port-sync] Port file empty, watching..."
@@ -94,8 +126,8 @@ data:
         if [ "$ELAPSED" -ge "$VPN_RESET_TIMEOUT" ]; then
           echo "[port-sync] Port file empty for ${ELAPSED}s — restarting VPN via Gluetun API"
           curl -sf -X PUT -H "Content-Type: application/json" \
-            -d '{"status":"stopped"}' "${GLUETUN_API}/v1/vpn/status" && \
-          sleep 5 && \
+            -d '{"status":"stopped"}' "${GLUETUN_API}/v1/vpn/status"
+          sleep 5
           curl -sf -X PUT -H "Content-Type: application/json" \
             -d '{"status":"running"}' "${GLUETUN_API}/v1/vpn/status"
           rm -f "$EMPTY_SINCE_FILE"
