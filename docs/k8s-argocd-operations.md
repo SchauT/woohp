@@ -195,6 +195,42 @@ WireGuard credentials (private key, addresses) live in a SOPS-encrypted `secrets
 
 **Pitfall — ProtonVPN NAT-PMP lease resets**: ProtonVPN renews port-forwarding leases via NAT-PMP (UDP 5351) every ~90 seconds. The server occasionally resets, causing `connection refused` errors in Gluetun logs. Gluetun recovers automatically (clears the old port, requests a new one), but the new port must be propagated to the application.
 
+**Pitfall — stale WireGuard ip rule kills reconnects after sidecar crash**: When a Gluetun sidecar crashes and Kubernetes restarts it within the *same pod*, the pod's network namespace is reused. The old WireGuard routing rule (`ip rule table 51820`) left by the crashed instance is still present. Every reconnect attempt fails with:
+
+```
+ERROR [vpn] adding IPv6 rule: adding ip rule 101: from all to all table 51820: file exists
+```
+
+Gluetun then enters an exponential back-off (2m → 4m → 8m → ... → hours), so the VPN stays down long after a pod-level `selfHeal` would have fixed it.
+
+**Fix**: Add a `lifecycle.postStart` hook to the Gluetun init container to delete any stale rules before WireGuard starts:
+
+```yaml
+lifecycle:
+  postStart:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "(ip rule del table 51820; ip -6 rule del table 51820) || true"
+```
+
+Reference: [Gluetun wiki — Kubernetes: adding IPv6 rule file exists](https://github.com/qdm12/gluetun-wiki/blob/main/setup/advanced/kubernetes.md#adding-ipv6-rule--file-exists)
+
+**Immediate recovery** (without waiting for ArgoCD): delete the pod so it gets a fresh network namespace — `kubectl delete pod -n media <pod>`. The Deployment recreates it immediately.
+
+**Pitfall — crashed Gluetun does not clear `forwarded_port`**: On a VPN crash, Gluetun does **not** clear `/tmp/gluetun/forwarded_port`. A heal script that only watches for an empty port file will never detect the crash and never trigger a restart. The fix is to query `/v1/vpn/status` directly at each poll interval and track how long the status has been non-`running`:
+
+```sh
+VPN_STATUS=$(wget -qO- "http://localhost:8320/v1/vpn/status" 2>/dev/null \
+  | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+if [ "$VPN_STATUS" != "running" ]; then
+  # track elapsed time and restart via API after threshold
+fi
+```
+
+The full resilient implementation lives in `k8s/charts/qbittorrent/templates/configmap-init.yaml` (`02-port-sync.sh`).
+
 **Pattern — dynamic port sync for qBittorrent**: Gluetun writes the current forwarded port to `/tmp/gluetun/forwarded_port`. Share that path between containers via an `emptyDir` volume and use a background script in the app container to poll and update the listen port via the app's API:
 
 ```yaml
