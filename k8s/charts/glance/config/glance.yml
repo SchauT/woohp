@@ -104,6 +104,10 @@ pages:
                 url: https://qbittorrent.raccoon-pence.ts.net/
                 check-url: http://qbittorrent.media.svc.woohp.local:8200
                 icon: si:qbittorrent
+              - title: Qui
+                url: https://qui.raccoon-pence.ts.net/
+                check-url: http://qui.media.svc.woohp.local:7476
+                icon: si:qbittorrent
               - title: Bazarr
                 url: https://bazarr.raccoon-pence.ts.net/
                 check-url: http://bazarr.media.svc.woohp.local:6767

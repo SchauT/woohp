@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "qui.fullname" . }}
+  labels:
+    {{- include "qui.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "qui.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "qui.labels" . | nindent 8 }}
+    spec:
+      enableServiceLinks: false
+      containers:
+        - name: qui
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: TZ
+              value: {{ .Values.env.TZ | quote }}
+            - name: QUI__AUTH_DISABLED
+              value: {{ .Values.env.QUI__AUTH_DISABLED | quote }}
+            - name: QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA
+              value: {{ .Values.env.QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA | quote }}
+            - name: QUI__AUTH_DISABLED_ALLOWED_CIDRS
+              value: {{ .Values.env.QUI__AUTH_DISABLED_ALLOWED_CIDRS | quote }}
+            - name: QUI__DATA_DIR
+              value: {{ .Values.env.QUI__DATA_DIR | quote }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz/readiness
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz/liveness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ include "qui.fullname" . }}-config

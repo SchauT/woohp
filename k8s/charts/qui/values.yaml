@@ -1,0 +1,43 @@
+image:
+  repository: ghcr.io/autobrr/qui
+  pullPolicy: IfNotPresent
+  tag: "v1.20.0"
+
+containerPort: 7476
+
+env:
+  TZ: "Europe/Paris"
+  QUI__AUTH_DISABLED: "true"
+  QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA: "true"
+  QUI__AUTH_DISABLED_ALLOWED_CIDRS: "10.244.0.0/16,192.168.1.0/24"
+  QUI__DATA_DIR: "/config"
+
+persistence:
+  config:
+    storageClass: longhorn
+    size: 1Gi
+
+service:
+  type: ClusterIP
+  port: 7476
+
+ingress:
+  enabled: true
+  className: tailscale
+  hosts:
+    - host: qui
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - qui
+      secretName: qui-tls
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
