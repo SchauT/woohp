@@ -13,6 +13,9 @@ securityContext:
 env:
   TZ: "Europe/Paris"
 
+auth:
+  method: "External"
+
 persistence:
   config:
     storageClass: longhorn

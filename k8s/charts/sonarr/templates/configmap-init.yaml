@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sonarr.fullname" . }}-init
+  labels:
+    {{- include "sonarr.labels" . | nindent 4 }}
+data:
+  01-auth-config.sh: |
+    #!/bin/sh
+    set -eu
+
+    CONF="/config/config.xml"
+    METHOD="{{ .Values.auth.method }}"
+
+    # Existing installs already have config.xml on the PVC.
+    # If missing (fresh install), Sonarr creates it on first start.
+    if [ ! -f "$CONF" ]; then
+      echo "[init-auth] $CONF not found; skipping auth patch"
+      exit 0
+    fi
+
+    BASE="${CONF}.init-base"
+    OUT="${CONF}.init-out"
+
+    # Keep all config, but drop any pre-existing AuthenticationMethod entries.
+    awk '!/<AuthenticationMethod>.*<\/AuthenticationMethod>/' "$CONF" > "$BASE"
+
+    if grep -q '</Config>' "$BASE"; then
+      awk -v method="$METHOD" '
+        !done && /<\/Config>/ {
+          print "  <AuthenticationMethod>" method "</AuthenticationMethod>"
+          done = 1
+        }
+        { print }
+      ' "$BASE" > "$OUT"
+    else
+      # Defensive fallback for malformed XML: keep file and append key once.
+      cp "$BASE" "$OUT"
+      printf '\n<AuthenticationMethod>%s</AuthenticationMethod>\n' "$METHOD" >> "$OUT"
+    fi
+
+    mv "$OUT" "$CONF"

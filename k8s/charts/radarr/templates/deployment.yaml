@@ -13,6 +13,8 @@ spec:
       {{- include "radarr.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print .Template.BasePath "/configmap-init.yaml") . | sha256sum }}
       labels:
         {{- include "radarr.labels" . | nindent 8 }}
     spec:
@@ -54,6 +56,8 @@ spec:
               mountPath: /config
             - name: media-data
               mountPath: /data
+            - name: radarr-init
+              mountPath: /custom-cont-init.d
       volumes:
         - name: config
           persistentVolumeClaim:
@@ -61,3 +65,7 @@ spec:
         - name: media-data
           persistentVolumeClaim:
             claimName: media-data
+        - name: radarr-init
+          configMap:
+            name: {{ include "radarr.fullname" . }}-init
+            defaultMode: 0755
