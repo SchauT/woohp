@@ -1,5 +1,6 @@
 .DS_Store
 .envrc
+.tmp
 woohp-kubeconfig
 
 **/charts/*.tgz
