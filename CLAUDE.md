@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | --- | --- |
 | Understand the repo & rules (start here) | `AGENTS.md` |
 | Operate Talos nodes (regen config, rollout, recovery) | `docs/talos-operations.md` |
+| Upgrade Talos/K8s versions (Renovate bump rollout) | `docs/cluster-upgrade.md` |
 | Operate K8s/ArgoCD (deploy, sync, add a service, VPN sidecar) | `docs/k8s-argocd-operations.md` |
 | Bootstrap the cluster from scratch | `docs/k8s-bootstrap.md` |
 | Change node OS config | `talos/talconfig.yaml`, `talos/talsecret.sops.yaml` (never `talos/clusterconfig/*` — generated) |

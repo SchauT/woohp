@@ -71,15 +71,9 @@ talosctl -n "$SAM" logs kubelet
 
 ## Upgrade Notes
 
-Talos version is pinned in `talos/talconfig.yaml` (`talosVersion`).
+Versions are pinned in `talos/talconfig.yaml` (`talosVersion`, `kubernetesVersion`), typically bumped by a Renovate PR. Merging the PR is **not** the upgrade — it only changes the source of truth, and `gen_and_apply_conf_to_all_nodes.sh` does not perform version upgrades.
 
-For image-based upgrades (when needed):
-
-```bash
-talosctl upgrade --nodes "$NODE" --image factory.talos.dev/metal-installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:<VERSION>
-```
-
-Run upgrades one node at a time and verify etcd quorum after each node.
+For the full rollout procedure (OS `talosctl upgrade` per node → `upgrade-k8s` → persist config), follow the dedicated runbook: **[cluster-upgrade.md](cluster-upgrade.md)**.
 
 ## Secrets (SOPS + age)
 

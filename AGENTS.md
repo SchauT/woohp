@@ -10,8 +10,8 @@ This repository manages the **woohp** homelab cluster with a GitOps workflow:
 
 Current source-of-truth versions are in `talos/talconfig.yaml`:
 
-- `talosVersion: v1.12.6`
-- `kubernetesVersion: v1.35.3`
+- `talosVersion: v1.13.6`
+- `kubernetesVersion: v1.36.2`
 
 Cluster topology:
 
@@ -82,6 +82,7 @@ Do not start implementation until the plan is confirmed. Do not close a session 
 Use detailed docs for operational tasks instead of expanding this file:
 
 - `docs/talos-operations.md`
+- `docs/cluster-upgrade.md`
 - `docs/k8s-argocd-operations.md`
 - `docs/k8s-bootstrap.md`
 
