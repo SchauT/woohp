@@ -107,3 +107,47 @@ nodes:
           officialExtensions:
             - siderolabs/iscsi-tools
             - siderolabs/util-linux-tools
+
+  - hostname: mandy
+    ipAddress: 192.168.1.104
+    controlPlane: false
+    # Vérifié en maintenance mode : SSD SATA 256G (sda=clé USB de boot,
+    # sdc=HDD 1To libre pour du stockage). NIC filaire = enp3s0f1.
+    installDisk: /dev/sdb
+    patches:
+      - |-
+        machine:
+          network:
+            interfaces:
+              - addresses:
+                  - 192.168.1.104/24
+                interface: enp3s0f1
+                dhcp: false
+                routes:
+                  - gateway: 192.168.1.254
+                    network: 0.0.0.0/0
+          kubelet:
+            extraMounts:
+              - destination: /var/lib/longhorn
+                type: bind
+                source: /var/lib/longhorn
+                options:
+                  - bind
+                  - rshared
+                  - rw
+          kernel:
+            modules:
+              - name: nvidia
+              - name: nvidia_uvm
+              - name: nvidia_drm
+              - name: nvidia_modeset
+          sysctls:
+            net.core.bpf_jit_harden: 1
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+            - siderolabs/nonfree-kmod-nvidia-lts
+            - siderolabs/nvidia-container-toolkit-lts

@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nvidia-device-plugin
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/SchauT/woohp.git'
+    targetRevision: HEAD
+    path: k8s/charts/nvidia-device-plugin
+    helm:
+      releaseName: nvidia-device-plugin
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
