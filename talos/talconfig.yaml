@@ -111,9 +111,9 @@ nodes:
   - hostname: mandy
     ipAddress: 192.168.1.104
     controlPlane: false
-    # NOTE: interface/installDisk copiés des CP — À VÉRIFIER en maintenance mode
-    # sur l'Acer Nitro avant le 1er apply (talosctl get links/disks --insecure).
-    installDisk: /dev/nvme0n1
+    # Vérifié en maintenance mode : SSD SATA 256G (sda=clé USB de boot,
+    # sdc=HDD 1To libre pour du stockage). NIC filaire = enp3s0f1.
+    installDisk: /dev/sdb
     patches:
       - |-
         machine:
@@ -121,7 +121,7 @@ nodes:
             interfaces:
               - addresses:
                   - 192.168.1.104/24
-                interface: enp1s0f0
+                interface: enp3s0f1
                 dhcp: false
                 routes:
                   - gateway: 192.168.1.254
