@@ -61,8 +61,13 @@ the node is back (`post check passed`).
 ```bash
 # from talos/ , use the commands emitted by `talhelper gencommand upgrade`, e.g.:
 talosctl upgrade --talosconfig=./clusterconfig/talosconfig --nodes="$SAM" \
-  --image=factory.talos.dev/metal-installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:<talosVersion>
+  --image=factory.talos.dev/metal-installer/<schematicId>:<talosVersion>
 ```
+
+> The schematic ID `613e1592…` encodes the extensions `siderolabs/iscsi-tools`
+> and `siderolabs/util-linux-tools`. If extensions change in `talconfig.yaml`,
+> the ID changes — always take it from `talhelper gencommand upgrade`, never
+> hard-code it.
 
 After each node, verify before continuing:
 
@@ -71,11 +76,6 @@ talosctl -n "$SAM" -e "$SAM" version | sed -n '/Server:/,$p' | grep Tag   # new 
 talosctl -n "$VIP" -e "$VIP" etcd members                                 # still 3 members
 kubectl get nodes                                                         # all Ready
 ```
-
-The schematic ID `613e1592…` encodes the extensions `siderolabs/iscsi-tools`
-and `siderolabs/util-linux-tools`. If extensions change in `talconfig.yaml`,
-the ID changes — always take it from `talhelper gencommand upgrade`, never
-hard-code it.
 
 ## 4. Upgrade Kubernetes — once all nodes are on the new Talos version
 
