@@ -16,6 +16,9 @@ spec:
       labels:
         {{- include "jellyfin.labels" . | nindent 8 }}
     spec:
+      runtimeClassName: nvidia
+      nodeSelector:
+        nvidia.com/gpu.present: "true"
       securityContext:
         runAsUser: {{ .Values.securityContext.runAsUser }}
         runAsGroup: {{ .Values.securityContext.runAsGroup }}

@@ -2,12 +2,14 @@ VIP=192.168.1.100
 SAM=192.168.1.101
 CLOVER=192.168.1.102
 ALEX=192.168.1.103
+MANDY=192.168.1.104
 
 talosctl -n $VIP etcd members
 
 mv clusterconfig/woohp-sam.yaml clusterconfig/woohp-sam.yaml.bak
 mv clusterconfig/woohp-clover.yaml clusterconfig/woohp-clover.yaml.bak
 mv clusterconfig/woohp-alex.yaml clusterconfig/woohp-alex.yaml.bak
+mv clusterconfig/woohp-mandy.yaml clusterconfig/woohp-mandy.yaml.bak
 mv clusterconfig/talosconfig clusterconfig/talosconfig.bak
 
 talhelper genconfig
@@ -62,6 +64,23 @@ if [[ "$ALEX_CONFIRMATION" == "y" ]]; then
 else
     cp clusterconfig/woohp-alex.yaml.bak clusterconfig/woohp-alex.yaml
     echo "✗ ALEX configuration skipped"
+fi
+
+echo ""
+
+echo "========================================"
+echo "=== Reviewing MANDY Node Configuration ==="
+echo "========================================\n"
+diff --color -u clusterconfig/woohp-mandy.yaml.bak clusterconfig/woohp-mandy.yaml || true
+echo ""
+read -p "Apply configuration to MANDY node? (y/n): " MANDY_CONFIRMATION
+
+if [[ "$MANDY_CONFIRMATION" == "y" ]]; then
+    talosctl apply-config -e $MANDY -n $MANDY --file clusterconfig/woohp-mandy.yaml
+    echo "✓ MANDY configuration applied"
+else
+    cp clusterconfig/woohp-mandy.yaml.bak clusterconfig/woohp-mandy.yaml
+    echo "✗ MANDY configuration skipped"
 fi
 
 

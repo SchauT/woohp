@@ -107,3 +107,47 @@ nodes:
           officialExtensions:
             - siderolabs/iscsi-tools
             - siderolabs/util-linux-tools
+
+  - hostname: mandy
+    ipAddress: 192.168.1.104
+    controlPlane: false
+    # NOTE: interface/installDisk copiés des CP — À VÉRIFIER en maintenance mode
+    # sur l'Acer Nitro avant le 1er apply (talosctl get links/disks --insecure).
+    installDisk: /dev/nvme0n1
+    patches:
+      - |-
+        machine:
+          network:
+            interfaces:
+              - addresses:
+                  - 192.168.1.104/24
+                interface: enp1s0f0
+                dhcp: false
+                routes:
+                  - gateway: 192.168.1.254
+                    network: 0.0.0.0/0
+          kubelet:
+            extraMounts:
+              - destination: /var/lib/longhorn
+                type: bind
+                source: /var/lib/longhorn
+                options:
+                  - bind
+                  - rshared
+                  - rw
+          kernel:
+            modules:
+              - name: nvidia
+              - name: nvidia_uvm
+              - name: nvidia_drm
+              - name: nvidia_modeset
+          sysctls:
+            net.core.bpf_jit_harden: 1
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+            - siderolabs/nonfree-kmod-nvidia-lts
+            - siderolabs/nvidia-container-toolkit-lts
