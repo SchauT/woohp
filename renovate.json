@@ -38,7 +38,8 @@
       "description": "Automerge patch updates except for Talos and K8s",
       "matchUpdateTypes": ["patch"],
       "matchPackageNames": ["!siderolabs/talos", "!kubernetes/kubernetes"],
-      "automerge": true
+      "automerge": true,
+      "platformAutomerge": false
     },
     {
       "groupName": "Helm chart dependencies",
