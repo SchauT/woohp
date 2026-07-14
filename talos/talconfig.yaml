@@ -35,6 +35,16 @@ nodes:
                   - bind
                   - rshared
                   - rw
+            extraConfig:
+              systemReserved:
+                memory: 512Mi
+              kubeReserved:
+                memory: 512Mi
+              evictionHard:
+                memory.available: "500Mi"
+                nodefs.available: "10%"
+                imagefs.available: "15%"
+                nodefs.inodesFree: "5%"
     schematic:
       customization:
         systemExtensions:
@@ -69,6 +79,16 @@ nodes:
                   - bind
                   - rshared
                   - rw
+            extraConfig:
+              systemReserved:
+                memory: 512Mi
+              kubeReserved:
+                memory: 512Mi
+              evictionHard:
+                memory.available: "500Mi"
+                nodefs.available: "10%"
+                imagefs.available: "15%"
+                nodefs.inodesFree: "5%"
     schematic:
       customization:
         systemExtensions:
@@ -101,6 +121,16 @@ nodes:
                   - bind
                   - rshared
                   - rw
+            extraConfig:
+              systemReserved:
+                memory: 512Mi
+              kubeReserved:
+                memory: 512Mi
+              evictionHard:
+                memory.available: "500Mi"
+                nodefs.available: "10%"
+                imagefs.available: "15%"
+                nodefs.inodesFree: "5%"
     schematic:
       customization:
         systemExtensions:
@@ -135,6 +165,16 @@ nodes:
                   - bind
                   - rshared
                   - rw
+            extraConfig:
+              systemReserved:
+                memory: 512Mi
+              kubeReserved:
+                memory: 512Mi
+              evictionHard:
+                memory.available: "500Mi"
+                nodefs.available: "10%"
+                imagefs.available: "15%"
+                nodefs.inodesFree: "5%"
           kernel:
             modules:
               - name: nvidia
