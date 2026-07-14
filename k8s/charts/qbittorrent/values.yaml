@@ -48,14 +48,14 @@ resources:
   qbittorrent:
     requests:
       cpu: 200m
-      memory: 512Mi
+      memory: 2Gi
     limits:
       cpu: "2"
       memory: 2Gi
   gluetun:
     requests:
       cpu: 100m
-      memory: 64Mi
+      memory: 256Mi
     limits:
       cpu: 500m
       memory: 256Mi
