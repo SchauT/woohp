@@ -31,6 +31,46 @@
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "kubernetes/kubernetes",
       "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/k8s/charts/argocd/values\\.yaml$/"],
+      "matchStrings": ["name:\\s*HELM_SECRETS_VERSION\\s*\\n\\s*value:\\s*\"(?<currentValue>[\\d.]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "jkroepke/helm-secrets",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/k8s/charts/argocd/values\\.yaml$/"],
+      "matchStrings": ["name:\\s*KUBECTL_VERSION\\s*\\n\\s*value:\\s*\"(?<currentValue>[\\d.]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes/kubernetes",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/k8s/charts/argocd/values\\.yaml$/"],
+      "matchStrings": ["name:\\s*VALS_VERSION\\s*\\n\\s*value:\\s*\"(?<currentValue>[\\d.]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "helmfile/vals",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/k8s/charts/argocd/values\\.yaml$/"],
+      "matchStrings": ["name:\\s*SOPS_VERSION\\s*\\n\\s*value:\\s*\"(?<currentValue>[\\d.]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "getsops/sops",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/k8s/charts/argocd/values\\.yaml$/"],
+      "matchStrings": ["name:\\s*AGE_VERSION\\s*\\n\\s*value:\\s*\"(?<currentValue>[\\d.]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "FiloSottile/age",
+      "versioningTemplate": "semver"
     }
   ],
   "packageRules": [
