@@ -1,0 +1,6 @@
+apiVersion: v2
+name: mealie
+description: Mealie self-hosted recipe manager and meal planner
+type: application
+version: 1.0.0
+appVersion: "v3.22.0"

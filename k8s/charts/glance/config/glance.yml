@@ -120,6 +120,10 @@ pages:
                 url: https://n8n.raccoon-pence.ts.net/
                 check-url: http://n8n-main.n8n.svc.woohp.local:5678
                 icon: si:n8n
+              - title: Mealie
+                url: https://mealie.raccoon-pence.ts.net/
+                check-url: http://mealie.mealie.svc.woohp.local:9000
+                icon: si:mealie
 
           - $include: jellyfin-playing.yml
 
