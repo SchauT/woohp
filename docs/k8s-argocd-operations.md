@@ -381,6 +381,39 @@ Then point the upstream chart at it:
 
 `Chart.lock` and `charts/*.tgz` are excluded by `.gitignore`. Only `Chart.yaml`, `values.yaml`, `secrets.yaml`, and `templates/` are tracked.
 
+## Exposing an App Publicly via Tailscale Funnel
+
+All apps are exposed on the tailnet privately via `ingressClassName: tailscale` (see the umbrella-chart section above). Tailscale Funnel makes the **same** Ingress additionally reachable from the public internet, on the same hostname — no new resource, no separate hostname, private tailnet access keeps working unchanged.
+
+### How
+
+Add the annotation to the app's existing `ingress.annotations` (local chart) or `<dep-name>.ingress.annotations` (umbrella/OCI chart):
+
+```yaml
+ingress:
+  enabled: true
+  className: tailscale   # or ingressClassName: tailscale for OCI-dependency charts
+  annotations:
+    tailscale.com/funnel: "true"
+```
+
+Every app chart's `templates/ingress.yaml` already has an `annotations` passthrough, so this is a `values.yaml`-only change. For an app wrapping an upstream OCI chart, confirm the upstream `templates/ingress.yaml` has the same passthrough (`helm pull oci://... --untar` to inspect) before assuming it works.
+
+### Required manual step: Tailscale ACL
+
+This repo has no versioned Tailscale ACL policy (managed only in the Tailscale admin console). Funnel additionally requires a `nodeAttrs` grant for the tag applied to the operator's proxy devices (check the tag in the admin console's machine list — no explicit `TS_TAGS` override exists in this repo, so it's the operator's default tag):
+
+```json
+"nodeAttrs": [
+  {
+    "target": ["tag:k8s"],
+    "attr": ["funnel"]
+  }
+]
+```
+
+Without this grant, ArgoCD sync succeeds but Funnel stays refused by policy — fail-safe, not a security gap if forgotten.
+
 ## Chart and Repo Conventions
 
 - Helm dependency archives (`*.tgz`) are not tracked.

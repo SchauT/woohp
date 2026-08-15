@@ -11,6 +11,8 @@ seerr-chart:
   ingress:
     enabled: true
     ingressClassName: tailscale
+    annotations:
+      tailscale.com/funnel: "true"
     hosts:
       - host: seerr
         paths:
