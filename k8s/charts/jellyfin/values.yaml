@@ -25,6 +25,8 @@ service:
 ingress:
   enabled: true
   className: tailscale
+  annotations:
+    tailscale.com/funnel: "true"
   hosts:
     - host: jellyfin
       paths:
