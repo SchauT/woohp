@@ -63,7 +63,7 @@ argo-cd:
           - name: KUBECTL_VERSION
             value: "1.35.3"
           - name: VALS_VERSION
-            value: "0.43.7"
+            value: "0.46.0"
           - name: SOPS_VERSION
             value: "3.13.3"
           - name: AGE_VERSION
