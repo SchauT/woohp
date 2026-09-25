@@ -124,6 +124,10 @@ pages:
                 url: https://mealie.raccoon-pence.ts.net/
                 check-url: http://mealie.mealie.svc.woohp.local:9000
                 icon: si:mealie
+              - title: Halcyon Video
+                url: https://store.raccoon-pence.ts.net/
+                check-url: http://halcyon-video.media.svc.woohp.local:1420
+                icon: si:jellyfin
 
           - $include: jellyfin-playing.yml
 

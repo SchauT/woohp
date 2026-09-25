@@ -1,0 +1,35 @@
+image:
+  repository: ghcr.io/halcyon-video/halcyon-video
+  pullPolicy: IfNotPresent
+  tag: "v0.22.0"
+
+containerPort: 1420
+
+env:
+  HALCYON_JELLYFIN_URL: "https://jellyfin.raccoon-pence.ts.net"
+  HALCYON_ALLOWED_HOSTS: "store.raccoon-pence.ts.net"
+
+service:
+  type: ClusterIP
+  port: 1420
+
+ingress:
+  enabled: true
+  className: tailscale
+  hosts:
+    - host: store
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - store
+      secretName: halcyon-video-tls
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
