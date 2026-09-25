@@ -3,4 +3,4 @@ name: halcyon-video
 description: Jellyfin library as a walkable 1990s video rental store
 type: application
 version: 1.0.0
-appVersion: "v0.22.0"
+appVersion: "0.22.0"
