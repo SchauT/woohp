@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
 VIP=192.168.1.100
 SAM=192.168.1.101
 CLOVER=192.168.1.102
@@ -6,82 +9,41 @@ MANDY=192.168.1.104
 
 talosctl -n $VIP etcd members
 
-mv clusterconfig/woohp-sam.yaml clusterconfig/woohp-sam.yaml.bak
-mv clusterconfig/woohp-clover.yaml clusterconfig/woohp-clover.yaml.bak
-mv clusterconfig/woohp-alex.yaml clusterconfig/woohp-alex.yaml.bak
-mv clusterconfig/woohp-mandy.yaml clusterconfig/woohp-mandy.yaml.bak
-mv clusterconfig/talosconfig clusterconfig/talosconfig.bak
-
 talhelper genconfig
 
+review_and_apply() {
+    local name="$1"
+    local ip="$2"
+    local gen_file="clusterconfig/woohp-$name.yaml"
+    local live_file
+    live_file="$(mktemp)"
+    trap 'rm -f "$live_file"' RETURN
 
-echo "========================================"
-echo "=== Reviewing SAM Node Configuration ==="
-echo "========================================\n"
-diff --color -u clusterconfig/woohp-sam.yaml.bak clusterconfig/woohp-sam.yaml || true
-echo ""
-read -p "Apply configuration to SAM node? (y/n): " SAM_CONFIRMATION
+    # Compare against the machine config actually persisted on the node itself,
+    # not a local .bak from a previous run of this script (which can go stale
+    # if a prior run was skipped, interrupted, or the node was edited directly).
+    talosctl -n "$ip" -e "$ip" get machineconfig -o yaml 2>/dev/null \
+        | yq 'select(.metadata.id == "persistent") | .spec' -r > "$live_file"
 
-if [[ "$SAM_CONFIRMATION" == "y" ]]; then
-    talosctl apply-config -e $SAM -n $SAM --file clusterconfig/woohp-sam.yaml
-    echo "✓ SAM configuration applied"
-else
-    cp clusterconfig/woohp-sam.yaml.bak clusterconfig/woohp-sam.yaml
-    echo "✗ SAM configuration skipped"
-fi
+    echo "=========================================="
+    echo "=== Reviewing $(echo "$name" | tr '[:lower:]' '[:upper:]') Node Configuration (live vs generated) ==="
+    echo "=========================================="
+    diff --color -u "$live_file" "$gen_file" || true
+    echo ""
+    read -p "Apply configuration to $name node? (y/n): " CONFIRMATION
 
-echo ""
+    if [[ "$CONFIRMATION" == "y" ]]; then
+        talosctl apply-config -e "$ip" -n "$ip" --file "$gen_file"
+        echo "✅ $name configuration applied"
+    else
+        echo "❌ $name configuration skipped"
+    fi
+    echo ""
+}
 
-
-echo "==========================================="
-echo "=== Reviewing CLOVER Node Configuration ==="
-echo "==========================================="
-diff --color -u clusterconfig/woohp-clover.yaml.bak clusterconfig/woohp-clover.yaml || true
-echo ""
-read -p "Apply configuration to CLOVER node? (y/n): " CLOVER_CONFIRMATION
-
-if [[ "$CLOVER_CONFIRMATION" == "y" ]]; then
-    talosctl apply-config -e $CLOVER -n $CLOVER --file clusterconfig/woohp-clover.yaml
-    echo "✓ CLOVER configuration applied"
-else
-    cp clusterconfig/woohp-clover.yaml.bak clusterconfig/woohp-clover.yaml
-    echo "✗ CLOVER configuration skipped"
-fi
-
-echo ""
-
-
-echo "========================================="
-echo "=== Reviewing ALEX Node Configuration ==="
-echo "=========================================\n"
-diff --color -u clusterconfig/woohp-alex.yaml.bak clusterconfig/woohp-alex.yaml || true
-echo ""
-read -p "Apply configuration to ALEX node? (y/n): " ALEX_CONFIRMATION
-
-if [[ "$ALEX_CONFIRMATION" == "y" ]]; then
-    talosctl apply-config -e $ALEX -n $ALEX --file clusterconfig/woohp-alex.yaml
-    echo "✓ ALEX configuration applied"
-else
-    cp clusterconfig/woohp-alex.yaml.bak clusterconfig/woohp-alex.yaml
-    echo "✗ ALEX configuration skipped"
-fi
-
-echo ""
-
-echo "========================================"
-echo "=== Reviewing MANDY Node Configuration ==="
-echo "========================================\n"
-diff --color -u clusterconfig/woohp-mandy.yaml.bak clusterconfig/woohp-mandy.yaml || true
-echo ""
-read -p "Apply configuration to MANDY node? (y/n): " MANDY_CONFIRMATION
-
-if [[ "$MANDY_CONFIRMATION" == "y" ]]; then
-    talosctl apply-config -e $MANDY -n $MANDY --file clusterconfig/woohp-mandy.yaml
-    echo "✓ MANDY configuration applied"
-else
-    cp clusterconfig/woohp-mandy.yaml.bak clusterconfig/woohp-mandy.yaml
-    echo "✗ MANDY configuration skipped"
-fi
-
+review_and_apply sam "$SAM"
+review_and_apply clover "$CLOVER"
+review_and_apply alex "$ALEX"
+review_and_apply mandy "$MANDY"
 
 talosctl -n $VIP etcd members
