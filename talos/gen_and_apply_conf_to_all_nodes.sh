@@ -19,9 +19,7 @@ review_and_apply() {
     live_file="$(mktemp)"
     trap 'rm -f "$live_file"' RETURN
 
-    # Compare against the machine config actually persisted on the node itself,
-    # not a local .bak from a previous run of this script (which can go stale
-    # if a prior run was skipped, interrupted, or the node was edited directly).
+    # Compare against the machine config actually persisted on the node itself
     talosctl -n "$ip" -e "$ip" get machineconfig -o yaml 2>/dev/null \
         | yq 'select(.metadata.id == "persistent") | .spec' -r > "$live_file"
 
