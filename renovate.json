@@ -75,6 +75,12 @@
   ],
   "packageRules": [
     {
+      "description": "jellyfin/jellyfin switched from 3-part (10.11.11) to 2-part (12.1) tags; docker versioning's precision-matching would otherwise hide the update",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["jellyfin/jellyfin"],
+      "versioning": "semver-coerced"
+    },
+    {
       "description": "Automerge patch updates except for Talos and K8s",
       "matchUpdateTypes": ["patch"],
       "matchPackageNames": ["!siderolabs/talos", "!kubernetes/kubernetes"],
