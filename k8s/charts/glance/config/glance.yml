@@ -91,11 +91,11 @@ pages:
               - title: Seerr
                 url: https://seerr.raccoon-pence.ts.net/
                 check-url: http://seerr-seerr-chart.media.svc.woohp.local
-                icon: si:octopusdeploy
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/seerr.png
               - title: Prowlarr
                 url: https://prowlarr.raccoon-pence.ts.net/
                 check-url: http://prowlarr.media.svc.woohp.local:9696
-                icon: si:prowlarr
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/prowlarr.png
               - title: FlareSolverr
                 check-url: http://flaresolverr.media.svc.woohp.local:8191
                 allow-insecure: true
@@ -107,11 +107,11 @@ pages:
               - title: Qui
                 url: https://qui.raccoon-pence.ts.net/
                 check-url: http://qui.media.svc.woohp.local:7476
-                icon: si:qbittorrent
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/qui.png
               - title: Bazarr
                 url: https://bazarr.raccoon-pence.ts.net/
                 check-url: http://bazarr.media.svc.woohp.local:6767
-                icon: si:bazarr
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/bazarr.png
               - title: Paperless
                 url: https://paperless.raccoon-pence.ts.net/
                 check-url: http://paperless.paperless.svc.woohp.local:8000
@@ -127,7 +127,7 @@ pages:
               - title: Halcyon Video
                 url: https://store.raccoon-pence.ts.net/
                 check-url: http://halcyon-video.media.svc.woohp.local:1420
-                icon: si:jellyfin
+                icon: si:letterboxd
               - title: SnapOtter
                 url: https://snapotter.raccoon-pence.ts.net/
                 check-url: http://snapotter.tooling.svc.woohp.local:1349
