@@ -1,0 +1,57 @@
+image:
+  repository: ghcr.io/snapotter-hq/snapotter
+  pullPolicy: IfNotPresent
+  tag: "2.2.0"
+
+containerPort: 1349
+
+env:
+  SNAPOTTER_ANALYTICS: "off"
+
+redis:
+  image:
+    repository: redis
+    tag: "8-alpine"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+cnpg:
+  instances: 1
+  storage:
+    storageClass: longhorn
+    size: 3Gi
+
+persistence:
+  data:
+    storageClass: longhorn
+    size: 10Gi
+
+service:
+  type: ClusterIP
+  port: 1349
+
+ingress:
+  enabled: true
+  className: tailscale
+  hosts:
+    - host: snapotter
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - snapotter
+      secretName: snapotter-tls
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi

@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: snapotter-db
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "snapotter.labels" . | nindent 4 }}
+spec:
+  instances: {{ .Values.cnpg.instances }}
+  storage:
+    storageClass: {{ .Values.cnpg.storage.storageClass }}
+    size: {{ .Values.cnpg.storage.size }}
+  bootstrap:
+    initdb:
+      database: snapotter
+      owner: snapotter

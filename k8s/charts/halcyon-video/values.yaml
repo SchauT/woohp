@@ -7,7 +7,7 @@ containerPort: 1420
 
 env:
   HALCYON_JELLYFIN_URL: "https://jellyfin.raccoon-pence.ts.net"
-  HALCYON_ALLOWED_HOSTS: "store.raccoon-pence.ts.net"
+  HALCYON_ALLOWED_HOSTS: "store.raccoon-pence.ts.net,halcyon-video.media.svc.woohp.local"
 
 service:
   type: ClusterIP

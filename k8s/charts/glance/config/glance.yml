@@ -128,6 +128,10 @@ pages:
                 url: https://store.raccoon-pence.ts.net/
                 check-url: http://halcyon-video.media.svc.woohp.local:1420
                 icon: si:jellyfin
+              - title: SnapOtter
+                url: https://snapotter.raccoon-pence.ts.net/
+                check-url: http://snapotter.tooling.svc.woohp.local:1349
+                icon: https://snapotter.com/favicon.ico
 
           - $include: jellyfin-playing.yml
 
