@@ -1,0 +1,9 @@
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: lan-subnet-router
+spec:
+  hostname: woohp-lan
+  subnetRouter:
+    advertiseRoutes:
+      {{- toYaml .Values.lanSubnetRouter.advertiseRoutes | nindent 6 }}
