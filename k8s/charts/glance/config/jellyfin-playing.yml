@@ -89,6 +89,7 @@
         | withParameter "api_key" $apiKey
         | withParameter "activeWithinSeconds" "30"
         | withHeader "Accept" "application/json"
+        | withHeader "Authorization" (concat "MediaBrowser Token=\"" $apiKey "\"")
         | getResponse }}
 
       {{ if eq $sessionsCall.Response.StatusCode 200 }}
