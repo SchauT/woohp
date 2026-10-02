@@ -7,6 +7,25 @@ domain: woohp.local
 allowSchedulingOnMasters: true
 additionalMachineCertSans:
   - 192.168.1.100
+controlPlane:
+  patches:
+    - |-
+      apiVersion: v1alpha1
+      kind: KubeEtcdEncryptionConfig
+      $$patch: delete
+    - |-
+      apiVersion: v1alpha1
+      kind: KubeEtcdEncryptionConfig
+      config:
+        resources:
+          - providers:
+              - secretbox:
+                  keys:
+                    - name: key2
+                      secret: ${SECRETBOX_ENCRYPTION_SECRET}
+              - identity: {}
+            resources:
+              - secrets
 nodes:
   - hostname: sam
     ipAddress: 192.168.1.101
