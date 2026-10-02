@@ -17,7 +17,7 @@
 
     {{- else -}}
 
-      {{- $requestUrl := printf "%s/emby/Items/Counts?api_key=%s" $url $key -}}
+      {{- $requestUrl := printf "%s/Items/Counts?api_key=%s" $url $key -}}
       {{- $jellyfinData := newRequest $requestUrl | getResponse -}}
 
       {{- if eq $jellyfinData.Response.StatusCode 200 -}}
