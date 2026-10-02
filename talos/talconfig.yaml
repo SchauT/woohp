@@ -7,6 +7,28 @@ domain: woohp.local
 allowSchedulingOnMasters: true
 additionalMachineCertSans:
   - 192.168.1.100
+patches:
+  - |-
+    machine:
+      kubelet:
+        extraMounts:
+          - destination: /var/lib/longhorn
+            type: bind
+            source: /var/lib/longhorn
+            options:
+              - bind
+              - rshared
+              - rw
+        extraConfig:
+          systemReserved:
+            memory: 512Mi
+          kubeReserved:
+            memory: 512Mi
+          evictionHard:
+            memory.available: "500Mi"
+            nodefs.available: "10%"
+            imagefs.available: "15%"
+            nodefs.inodesFree: "5%"
 controlPlane:
   patches:
     - |-
@@ -45,25 +67,6 @@ nodes:
                     network: 0.0.0.0/0
                 vip:
                   ip: 192.168.1.100
-          kubelet:
-            extraMounts:
-              - destination: /var/lib/longhorn
-                type: bind
-                source: /var/lib/longhorn
-                options:
-                  - bind
-                  - rshared
-                  - rw
-            extraConfig:
-              systemReserved:
-                memory: 512Mi
-              kubeReserved:
-                memory: 512Mi
-              evictionHard:
-                memory.available: "500Mi"
-                nodefs.available: "10%"
-                imagefs.available: "15%"
-                nodefs.inodesFree: "5%"
     schematic:
       customization:
         systemExtensions:
@@ -89,25 +92,6 @@ nodes:
                     network: 0.0.0.0/0
                 vip:
                   ip: 192.168.1.100
-          kubelet:
-            extraMounts:
-              - destination: /var/lib/longhorn
-                type: bind
-                source: /var/lib/longhorn
-                options:
-                  - bind
-                  - rshared
-                  - rw
-            extraConfig:
-              systemReserved:
-                memory: 512Mi
-              kubeReserved:
-                memory: 512Mi
-              evictionHard:
-                memory.available: "500Mi"
-                nodefs.available: "10%"
-                imagefs.available: "15%"
-                nodefs.inodesFree: "5%"
     schematic:
       customization:
         systemExtensions:
@@ -131,25 +115,6 @@ nodes:
                 routes:
                   - gateway: 192.168.1.254
                     network: 0.0.0.0/0
-          kubelet:
-            extraMounts:
-              - destination: /var/lib/longhorn
-                type: bind
-                source: /var/lib/longhorn
-                options:
-                  - bind
-                  - rshared
-                  - rw
-            extraConfig:
-              systemReserved:
-                memory: 512Mi
-              kubeReserved:
-                memory: 512Mi
-              evictionHard:
-                memory.available: "500Mi"
-                nodefs.available: "10%"
-                imagefs.available: "15%"
-                nodefs.inodesFree: "5%"
     schematic:
       customization:
         systemExtensions:
@@ -175,25 +140,6 @@ nodes:
                 routes:
                   - gateway: 192.168.1.254
                     network: 0.0.0.0/0
-          kubelet:
-            extraMounts:
-              - destination: /var/lib/longhorn
-                type: bind
-                source: /var/lib/longhorn
-                options:
-                  - bind
-                  - rshared
-                  - rw
-            extraConfig:
-              systemReserved:
-                memory: 512Mi
-              kubeReserved:
-                memory: 512Mi
-              evictionHard:
-                memory.available: "500Mi"
-                nodefs.available: "10%"
-                imagefs.available: "15%"
-                nodefs.inodesFree: "5%"
           kernel:
             modules:
               - name: nvidia
