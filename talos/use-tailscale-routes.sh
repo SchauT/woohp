@@ -14,6 +14,7 @@ SAM=192.168.1.101
 CLOVER=192.168.1.102
 ALEX=192.168.1.103
 MANDY=192.168.1.104
+NAS=192.168.1.110
 
 ACTION="${1:-add}"
 
@@ -27,7 +28,7 @@ if [[ -z "$TAILSCALE_IF" ]]; then
   exit 0
 fi
 
-for ip in "$VIP" "$SAM" "$CLOVER" "$ALEX" "$MANDY"; do
+for ip in "$VIP" "$SAM" "$CLOVER" "$ALEX" "$MANDY" "$NAS"; do
   case "$ACTION" in
     add)
       sudo route add -host "$ip" -interface "$TAILSCALE_IF" 2>&1 | grep -v "File exists" || true
