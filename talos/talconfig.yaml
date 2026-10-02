@@ -115,6 +115,8 @@ nodes:
                 routes:
                   - gateway: 192.168.1.254
                     network: 0.0.0.0/0
+                vip:
+                  ip: 192.168.1.100
     schematic:
       customization:
         systemExtensions:
