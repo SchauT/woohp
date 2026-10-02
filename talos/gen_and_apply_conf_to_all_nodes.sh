@@ -7,6 +7,9 @@ CLOVER=192.168.1.102
 ALEX=192.168.1.103
 MANDY=192.168.1.104
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+"$SCRIPT_DIR/use-tailscale-routes.sh" add
+
 talosctl -n $VIP etcd members
 
 talhelper genconfig
