@@ -1,0 +1,6 @@
+apiVersion: v2
+name: homelable
+description: Homelable self-hosted homelab topology visualizer (backend + frontend + MCP)
+type: application
+version: 1.0.0
+appVersion: "3.6.0"

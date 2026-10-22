@@ -132,6 +132,10 @@ pages:
                 url: https://snapotter.raccoon-pence.ts.net/
                 check-url: http://snapotter.tooling.svc.woohp.local:1349
                 icon: https://snapotter.com/favicon.ico
+              - title: Homelable
+                url: https://homelable.raccoon-pence.ts.net/
+                check-url: http://homelable.tooling.svc.woohp.local:80
+                icon: si:homeassistant
 
           - $include: jellyfin-playing.yml
 

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "homelable.fullname" . }}-env
+  labels:
+    {{- include "homelable.labels" . | nindent 4 }}
+data:
+  CORS_ORIGINS: {{ printf "[\"https://%s\"]" .Values.host | quote }}
+  {{- range $key, $value := .Values.env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
