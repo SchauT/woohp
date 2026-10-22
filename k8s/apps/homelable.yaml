@@ -18,7 +18,7 @@ spec:
         - secrets.yaml
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: tooling
+    namespace: homelable
   syncPolicy:
     automated:
       prune: true
