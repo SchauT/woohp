@@ -17,6 +17,8 @@ Cluster topology:
 
 - VIP: `192.168.1.100`
 - Control-plane nodes: `sam` (`192.168.1.101`), `clover` (`192.168.1.102`), `alex` (`192.168.1.103`)
+- Worker: `mandy` (`192.168.1.104`, NVIDIA GPU, 23 GiB RAM)
+- Live snapshot and diagrams: `docs/homelab-audit.md` (cluster currently on Talos v1.14.1 / Kubernetes v1.37.1)
 
 ## Build and Validate
 
@@ -77,6 +79,8 @@ Do not start implementation until the plan is confirmed. Do not close a session 
 - NFS-backed apps must use `PUID=3001`/`PGID=3001` (LinuxServer.io) or `runAsUser/Group/fsGroup: 3001` to match NAS dataset ownership. Mismatch causes silent permission-denied errors on writes.
 - If an app's Service has the same name as a prefix the app reads as an env var (e.g. Service `paperless` → Kubernetes injects `PAPERLESS_PORT=tcp://...`), the app crashes with an invalid port error. Fix: add `enableServiceLinks: false` to the pod spec.
 - `talhelper 3.1.17` generates the etcd `KubeEtcdEncryptionConfig` document with the secretbox key named `key1`, but every Secret already in etcd was encrypted under the historical name `key2` — after any `talconfig.yaml` regen on a cluster with existing Secrets, kube-apiserver goes `0/1 Ready` (`readyz`: `informer-sync failed`, logs: `no matching key was found for the provided Secretbox transformer`). Fixed permanently via a `$patch: delete` + re-add patch in `talconfig.yaml` for `sam`/`clover`/`alex` forcing `key2` + `identity` fallback. Do not remove that patch. See `docs/incident-2026-09-28-kube-apiserver-etcd-encryption.md`.
+- **Never put a `Namespace` template in a chart whose destination namespace is shared** (e.g. `tooling`). On 2026-10-22 doing so made ArgoCD adopt `tooling`; when the Application's destination later moved, prune deleted the whole namespace and wiped snapotter's PVCs (Longhorn reclaim `Delete`). Give apps that need special namespace labels (PodSecurity `privileged`) their own dedicated namespace, and push the `k8s/apps/<app>.yaml` destination change **before** adding a `Namespace` template (the live Application only updates after the app-of-apps syncs).
+- PodSecurity `baseline` (default on new namespaces) rejects `NET_RAW`/`NET_ADMIN`. Homelable (`NET_RAW` for ping checks) runs in its own `privileged` namespace `homelable`. Its backend needs a 1Gi memory limit: nmap scans of a /24 OOMKill it at 512Mi.
 
 ## Docs Index
 
@@ -86,6 +90,7 @@ Use detailed docs for operational tasks instead of expanding this file:
 - `docs/cluster-upgrade.md`
 - `docs/k8s-argocd-operations.md`
 - `docs/k8s-bootstrap.md`
+- `docs/homelab-audit.md` (architecture snapshot and diagrams)
 
 ## Session Close-Out
 
