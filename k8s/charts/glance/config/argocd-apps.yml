@@ -1,0 +1,47 @@
+- type: custom-api
+  title: "ArgoCD Apps"
+  cache: 1m
+  title-url: https://argo.raccoon-pence.ts.net/
+  url: https://argocd-server.argocd.svc.woohp.local/api/v1/applications?fields=items.metadata.name,items.status.health.status,items.status.sync.status
+  allow-insecure: true
+  headers:
+    Authorization: Bearer ${ARGOCD_TOKEN}
+    Accept: application/json
+
+  template: |
+    {{ $apps := .JSON.Array "items" }}
+    {{ $total := len $apps }}
+    {{ $healthy := 0 }}
+    {{ $synced := 0 }}
+    {{ range $apps }}
+      {{ if eq (.String "status.health.status") "Healthy" }}{{ $healthy = add $healthy 1 }}{{ end }}
+      {{ if eq (.String "status.sync.status") "Synced" }}{{ $synced = add $synced 1 }}{{ end }}
+    {{ end }}
+
+    <div class="flex flex-column gap-10">
+      <div class="flex justify-between text-center">
+        <div>
+          <div class="size-h3 {{ if eq $healthy $total }}color-positive{{ else }}color-negative{{ end }}">{{ $healthy }} / {{ $total }}</div>
+          <div class="size-h5 uppercase">Healthy</div>
+        </div>
+        <div>
+          <div class="size-h3 {{ if eq $synced $total }}color-positive{{ else }}color-negative{{ end }}">{{ $synced }} / {{ $total }}</div>
+          <div class="size-h5 uppercase">Synced</div>
+        </div>
+      </div>
+
+      {{ if or (ne $healthy $total) (ne $synced $total) }}
+      <ul class="list list-gap-2">
+        {{ range $apps }}
+          {{ $h := .String "status.health.status" }}
+          {{ $s := .String "status.sync.status" }}
+          {{ if or (ne $h "Healthy") (ne $s "Synced") }}
+          <li class="flex justify-between">
+            <span class="color-highlight text-truncate">{{ .String "metadata.name" }}</span>
+            <span class="color-negative size-h5">{{ if ne $h "Healthy" }}{{ $h }}{{ else }}{{ $s }}{{ end }}</span>
+          </li>
+          {{ end }}
+        {{ end }}
+      </ul>
+      {{ end }}
+    </div>
