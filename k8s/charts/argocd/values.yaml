@@ -2,6 +2,15 @@ argo-cd:
   dex:
     enabled: false
 
+  configs:
+    cm:
+      # Compte read-only pour le widget Glance (token via `argocd account generate-token --account glance`)
+      accounts.glance: apiKey
+    rbac:
+      policy.csv: |
+        p, role:glance, applications, get, */*, allow
+        g, glance, role:glance
+
   server:
     ingress:
       enabled: true
