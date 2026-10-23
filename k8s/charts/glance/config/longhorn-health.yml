@@ -21,7 +21,7 @@
     {{ end }}
     {{ range $nodes }}
       {{ if eq (.String "conditions.Ready.status") "True" }}{{ $nReady = add $nReady 1 }}{{ end }}
-      {{ range .Array "disks" }}
+      {{ range .Array "disks.@values" }}
         {{ $max = add $max (.Float "storageMaximum") }}
         {{ $avail = add $avail (.Float "storageAvailable") }}
       {{ end }}
