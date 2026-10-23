@@ -2,7 +2,7 @@
   title: "ArgoCD Apps"
   cache: 1m
   title-url: https://argo.raccoon-pence.ts.net/
-  url: https://argocd-server.argocd.svc.woohp.local/api/v1/applications?fields=items.metadata.name,items.status.health.status,items.status.sync.status
+  url: https://argocd-server.argocd.svc.woohp.local/api/v1/applications?fields=items.metadata.name,items.status.health,items.status.sync.status
   allow-insecure: true
   headers:
     Authorization: Bearer ${ARGOCD_TOKEN}
