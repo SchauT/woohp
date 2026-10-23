@@ -5,6 +5,10 @@ metadata:
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+    # added by ArgoCD on apps whose chart has a helm pre-delete hook (longhorn uninstall job);
+    # declared here so app-of-apps self-heal stops stripping them in a loop
+    - pre-delete-finalizer.argocd.argoproj.io
+    - pre-delete-finalizer.argocd.argoproj.io/cleanup
 spec:
   project: default
   source:
