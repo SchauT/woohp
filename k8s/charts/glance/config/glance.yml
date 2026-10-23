@@ -57,6 +57,8 @@ pages:
             widgets:
               - $include: gluetun-vpn-status.yml
               - $include: truenas-pools.yml
+              - $include: argocd-apps.yml
+              - $include: longhorn-health.yml
 
           - type: monitor
             cache: 1m
@@ -144,10 +146,6 @@ pages:
       - size: small
         widgets:
           - $include: qbittorrent-stats.yml
-
-          - $include: argocd-apps.yml
-
-          - $include: longhorn-health.yml
 
           - type: search
             search-engine: duckduckgo
