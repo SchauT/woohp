@@ -1,7 +1,7 @@
 image:
   repository: jellyfin/jellyfin
   pullPolicy: IfNotPresent
-  tag: "12.2"
+  tag: "12.3"
 
 containerPort: 8096
 
