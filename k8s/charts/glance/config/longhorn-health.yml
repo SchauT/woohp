@@ -1,0 +1,68 @@
+- type: custom-api
+  title: "Longhorn"
+  cache: 1m
+  title-url: https://longhorn.raccoon-pence.ts.net/
+  url: http://longhorn-frontend.longhorn-system.svc.woohp.local/v1/volumes
+  subrequests:
+    nodes:
+      url: http://longhorn-frontend.longhorn-system.svc.woohp.local/v1/nodes
+
+  template: |
+    {{ $volumes := .JSON.Array "data" }}
+    {{ $nodes := (.Subrequest "nodes").JSON.Array "data" }}
+    {{ $vTotal := len $volumes }}
+    {{ $nTotal := len $nodes }}
+    {{ $vHealthy := 0 }}
+    {{ $nReady := 0 }}
+    {{ $max := 0.0 }}
+    {{ $avail := 0.0 }}
+    {{ range $volumes }}
+      {{ if eq (.String "robustness") "healthy" }}{{ $vHealthy = add $vHealthy 1 }}{{ end }}
+    {{ end }}
+    {{ range $nodes }}
+      {{ if eq (.String "conditions.Ready.status") "True" }}{{ $nReady = add $nReady 1 }}{{ end }}
+      {{ range .Array "disks" }}
+        {{ $max = add $max (.Float "storageMaximum") }}
+        {{ $avail = add $avail (.Float "storageAvailable") }}
+      {{ end }}
+    {{ end }}
+    {{ $used := sub $max $avail }}
+    {{ $pct := div $used (div $max 100.0) }}
+
+    <div class="flex flex-column gap-10">
+      <div class="flex justify-between text-center">
+        <div>
+          <div class="size-h3 {{ if eq $vHealthy $vTotal }}color-positive{{ else }}color-negative{{ end }}">{{ $vHealthy }} / {{ $vTotal }}</div>
+          <div class="size-h5 uppercase">Volumes</div>
+        </div>
+        <div>
+          <div class="size-h3 {{ if eq $nReady $nTotal }}color-positive{{ else }}color-negative{{ end }}">{{ $nReady }} / {{ $nTotal }}</div>
+          <div class="size-h5 uppercase">Nodes</div>
+        </div>
+        <div>
+          <div class="size-h3 {{ if gt $pct 80.0 }}color-negative{{ else }}color-highlight{{ end }}">{{ printf "%.0f%%" $pct }}</div>
+          <div class="size-h5 uppercase">Disk</div>
+        </div>
+      </div>
+
+      {{ if or (ne $vHealthy $vTotal) (ne $nReady $nTotal) }}
+      <ul class="list list-gap-2">
+        {{ range $nodes }}
+          {{ if ne (.String "conditions.Ready.status") "True" }}
+          <li class="flex justify-between">
+            <span class="color-highlight text-truncate">{{ .String "name" }}</span>
+            <span class="color-negative size-h5">NotReady</span>
+          </li>
+          {{ end }}
+        {{ end }}
+        {{ range $volumes }}
+          {{ if ne (.String "robustness") "healthy" }}
+          <li class="flex justify-between">
+            <span class="color-highlight text-truncate">{{ if .String "kubernetesStatus.pvcName" }}{{ .String "kubernetesStatus.pvcName" }}{{ else }}{{ .String "name" }}{{ end }}</span>
+            <span class="color-negative size-h5">{{ .String "robustness" }}</span>
+          </li>
+          {{ end }}
+        {{ end }}
+      </ul>
+      {{ end }}
+    </div>
