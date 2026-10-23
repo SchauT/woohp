@@ -58,8 +58,6 @@ pages:
               - $include: gluetun-vpn-status.yml
               - $include: truenas-pools.yml
 
-          - $include: argocd-apps.yml
-
           - type: monitor
             cache: 1m
             title: Services
@@ -146,6 +144,8 @@ pages:
       - size: small
         widgets:
           - $include: qbittorrent-stats.yml
+
+          - $include: argocd-apps.yml
 
           - type: search
             search-engine: duckduckgo
