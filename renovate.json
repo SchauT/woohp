@@ -81,6 +81,21 @@
       "versioning": "semver-coerced"
     },
     {
+      "description": "linuxserver.io tags: the -lsN suffix changes every build, docker versioning would treat it as incompatible and hide updates",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "lscr.io/linuxserver/radarr",
+        "lscr.io/linuxserver/sonarr"
+      ],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\.(?<build>\\d+)-ls(?<revision>\\d+)$"
+    },
+    {
+      "description": "linuxserver.io qbittorrent tags (5.1.4-r3-ls453): same -lsN issue, plus the -rN packaging revision",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-r(?<build>\\d+)-ls(?<revision>\\d+)$"
+    },
+    {
       "description": "Automerge patch updates except for Talos and K8s",
       "matchUpdateTypes": ["patch"],
       "matchPackageNames": ["!siderolabs/talos", "!kubernetes/kubernetes"],
