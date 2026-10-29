@@ -510,3 +510,10 @@ Jellyfin runs on `mandy` with the GTX 1050 (`runtimeClassName: nvidia`, `nvidia.
 - Check: during a transcode, `kubectl -n media exec deploy/jellyfin -- nvidia-smi` shows encoder/decoder usage, and the newest `/config/log/FFmpeg.Transcode-*` contains `-hwaccel cuda` and `h264_nvenc`.
 
 API note: Jellyfin 12 rejects `X-Emby-Token`; use `Authorization: MediaBrowser Token="<key>"`.
+
+## Fast Availability for Seerr Requests
+
+Chain: Seerr request → Sonarr/Radarr search → qBittorrent → import (completed download handling polls every ~1 min) → Jellyfin.
+
+- **Delay**: the default delay profile waits 30 min on torrents (lets better releases show up). Seerr tags every request with `seerr` (Seerr → Services → Sonarr/Radarr → Tags), and the `seerr`-tagged delay profile (order 1) has 0 min, so requests grab immediately. The tag stays on the item, so its later upgrades also skip the delay.
+- **Jellyfin refresh**: Jellyfin's real-time monitor only sees file changes made from the same node (inotify does not cross NFS clients). It works today because Sonarr/Radarr/qBittorrent happen to run on `mandy` with Jellyfin; they are not pinned. Reliable path: Sonarr/Radarr **Connect → Emby / Jellyfin** with *Update Library* on import/upgrade/rename/delete, which asks Jellyfin to rescan just that folder. Each app uses its own Jellyfin API key (Jellyfin → Dashboard → API Keys).
