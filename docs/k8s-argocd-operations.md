@@ -469,3 +469,32 @@ Longhorn supports online volume expansion (`allowVolumeExpansion: true`). The fi
    ```
 
 **Pitfall**: the PVC `Capacity` field in `kubectl get pvc` does not update until after the pod restarts and the filesystem is resized. Do not assume the resize failed if the capacity still shows the old value before the restart.
+
+## Media Quality Profiles (Recyclarr)
+
+`k8s/charts/recyclarr` is a daily CronJob (04:00 Europe/Paris) that syncs TRaSH Guides custom formats, scores and quality sizes into Sonarr/Radarr. Config: `k8s/charts/recyclarr/config/recyclarr.yml`.
+
+- Profiles: `[French MULTi.VF]` (Sonarr, Radarr default) and `[French MULTi.VO]` (Radarr, films where no VF exists). Both prefer MULTi (VF+VO, +500).
+- DTS / TrueHD / VC-1 get -300 (no native Apple TV decode, Jellyfin clients stutter), `min_format_score: -300` so they remain a last resort.
+- `Golden Rule HD` CF group is skipped on purpose: it scores x265 1080p at -10000 and would re-download most of the library.
+- Manual edits to Recyclarr-managed profiles/CFs in the UI are overwritten nightly — change the YAML instead.
+- Recyclarr does not assign profiles to series/movies; that is done in Sonarr/Radarr (bulk editor).
+- French indexers (C411, G3MINI, TR4KER, V3X, YggReborn) need **Multi Languages = Original + French** in Sonarr/Radarr indexer settings, otherwise `MULTi` releases never get the +500. Prowlarr's sync keeps this field.
+
+Run a sync now / preview a config change:
+
+```bash
+kubectl -n media create job recyclarr-manual-$(date +%s) --from=cronjob/recyclarr
+kubectl -n media logs -f job/<job-name>
+```
+
+**Pitfall**: without `--log`, Recyclarr prints nothing for config errors (e.g. duplicate instance names across sonarr/radarr) and still exits 0. The CronJob passes `--log info`; use `--log debug` with `sync --preview` to see what would change.
+
+## Torrent Cleanup (qui)
+
+qui mounts `media-data` read-only at `/data` (same path as qBittorrent) so automations can read hardlink counts.
+
+- Automation **"Remove replaced or deleted library torrents"** (qui UI → Automations): categories `series`/`movies` (+`.cross`), `HARDLINK_SCOPE != outside_qbittorrent`, no skipped files, seeded ≥ 14 days, tag not containing `keep` → delete with files (cross-seeds preserved). Created **disabled**; preview it before enabling.
+- A torrent that was never imported also has no outside hardlink and would be deleted (e.g. The Maxx, tagged `keep`). Tag `keep` on anything you want to protect.
+- Orphan scan (files in qBittorrent save paths not owned by any torrent) runs daily in preview mode only (`autoCleanupEnabled=false`). It does not scan the temp path `/data/torrents/incomplete`.
+- To avoid orphans: cancel downloads from the Sonarr/Radarr queue (removes data), or tick "delete files" when removing a torrent in qBittorrent/qui.
