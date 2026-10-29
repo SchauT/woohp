@@ -494,7 +494,8 @@ kubectl -n media logs -f job/<job-name>
 
 qui mounts `media-data` read-only at `/data` (same path as qBittorrent) so automations can read hardlink counts.
 
-- Automation **"Remove replaced or deleted library torrents"** (qui UI → Automations): categories `series`/`movies` (+`.cross`), `HARDLINK_SCOPE != outside_qbittorrent`, no skipped files, seeded ≥ 14 days, tag not containing `keep` → delete with files (cross-seeds preserved). Created **disabled**; preview it before enabling.
-- A torrent that was never imported also has no outside hardlink and would be deleted (e.g. The Maxx, tagged `keep`). Tag `keep` on anything you want to protect.
+- Automation **"Remove replaced or deleted library torrents"** (qui UI → Automations): categories `series`/`movies` (+`.cross`), `HARDLINK_SCOPE != outside_qbittorrent`, no skipped files, seeded ≥ 14 days, tag not containing `keep` → delete with files (cross-seeds preserved). Enabled 2026-10-29 after a reviewed preview; use the rule preview in qui before changing its conditions.
+- A torrent that was never imported also has no outside hardlink and gets deleted after 14 days. Tag `keep` on anything you want to protect.
 - Orphan scan (files in qBittorrent save paths not owned by any torrent) runs daily in preview mode only (`autoCleanupEnabled=false`). It does not scan the temp path `/data/torrents/incomplete`.
+- Freed space may not show in `df` right away: the NAS dataset likely keeps snapshots that hold deleted blocks until they expire.
 - To avoid orphans: cancel downloads from the Sonarr/Radarr queue (removes data), or tick "delete files" when removing a torrent in qBittorrent/qui.
