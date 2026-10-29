@@ -474,7 +474,8 @@ Longhorn supports online volume expansion (`allowVolumeExpansion: true`). The fi
 
 `k8s/charts/recyclarr` is a daily CronJob (04:00 Europe/Paris) that syncs TRaSH Guides custom formats, scores and quality sizes into Sonarr/Radarr. Config: `k8s/charts/recyclarr/config/recyclarr.yml`.
 
-- Profiles: `[French MULTi.VF]` (Sonarr, Radarr default) and `[French MULTi.VO]` (Radarr, films where no VF exists). Both prefer MULTi (VF+VO, +500).
+- Profiles: `[French MULTi.VF]` (Sonarr series, Radarr default) and `[French MULTi.VO]` (Sonarr anime, Radarr films where no VF exists). Both prefer MULTi (VF+VO, +500); MULTi.VO also accepts VOSTFR-only.
+- Seerr: Sonarr server uses MULTi.VF as default profile and MULTi.VO as *anime* profile (anime = TMDB `anime` keyword), so requests land on the right profile.
 - DTS / TrueHD / VC-1 get -300 (no native Apple TV decode, Jellyfin clients stutter), `min_format_score: -300` so they remain a last resort.
 - `Golden Rule HD` CF group is skipped on purpose: it scores x265 1080p at -10000 and would re-download most of the library.
 - Manual edits to Recyclarr-managed profiles/CFs in the UI are overwritten nightly — change the YAML instead.

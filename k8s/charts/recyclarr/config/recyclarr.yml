@@ -19,6 +19,10 @@ sonarr:
         min_format_score: -300
         reset_unmatched_scores:
           enabled: true
+      - trash_id: 4c48f506c1116a3a57ae33f12346bd15 # [French MULTi.VO] HD Bluray + WEB (1080p): anime, accepts VOSTFR when no VF
+        min_format_score: -300
+        reset_unmatched_scores:
+          enabled: true
 
     custom_format_groups:
       skip:
@@ -34,9 +38,10 @@ sonarr:
           - 1808e4b9cee74e064dfae3f1db99dbfe # TrueHD
           - 0d7824bb924701997f874e7ff7d4844a # TrueHD Atmos
           - 7470a681e6205243983c4410ee4c920f # VC-1
+        score: -300
         assign_scores_to:
           - trash_id: 58e8dc75731040612dd6f4ac0676bfd7
-            score: -300
+          - trash_id: 4c48f506c1116a3a57ae33f12346bd15
 
 radarr:
   movies:
