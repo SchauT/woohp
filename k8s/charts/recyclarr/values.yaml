@@ -1,0 +1,22 @@
+image:
+  repository: ghcr.io/recyclarr/recyclarr
+  pullPolicy: IfNotPresent
+  tag: "8.8.0"
+
+# Daily, Europe/Paris
+schedule: "0 4 * * *"
+timeZone: "Europe/Paris"
+
+# apiKeys provided via secrets.yaml
+sonarr:
+  apiKey: ""
+radarr:
+  apiKey: ""
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

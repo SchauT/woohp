@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "recyclarr.fullname" . }}
+  labels:
+    {{- include "recyclarr.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.schedule | quote }}
+  timeZone: {{ .Values.timeZone | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            {{- include "recyclarr.selectorLabels" . | nindent 12 }}
+          annotations:
+            checksum/config: {{ (.Files.Glob "config/**").AsConfig | sha256sum }}
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: recyclarr
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              # --log: without it, errors (e.g. invalid config) are silent and the job still exits 0
+              args: ["sync", "--log", "info", "-c", "/config/recyclarr.yml"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              env:
+                - name: SONARR_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "recyclarr.fullname" . }}
+                      key: sonarr-api-key
+                - name: RADARR_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "recyclarr.fullname" . }}
+                      key: radarr-api-key
+              {{- with .Values.resources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              volumeMounts:
+                # ponytail: emptyDir, guide repos are re-cloned each run (~5s); state cache lost too, profiles are matched by name
+                - name: data
+                  mountPath: /config
+                - name: config
+                  mountPath: /config/recyclarr.yml
+                  subPath: recyclarr.yml
+          volumes:
+            - name: data
+              emptyDir: {}
+            - name: config
+              configMap:
+                name: {{ include "recyclarr.fullname" . }}

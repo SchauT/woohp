@@ -55,7 +55,15 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
+            # Same path as qBittorrent so automations can read hardlink counts (HARDLINK_SCOPE).
+            # ponytail: read-only, torrent deletes go through the qBittorrent API; orphan scan auto-cleanup needs rw
+            - name: media-data
+              mountPath: /data
+              readOnly: true
       volumes:
         - name: config
           persistentVolumeClaim:
             claimName: {{ include "qui.fullname" . }}-config
+        - name: media-data
+          persistentVolumeClaim:
+            claimName: media-data
