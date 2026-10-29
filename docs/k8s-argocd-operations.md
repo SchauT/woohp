@@ -500,3 +500,13 @@ qui mounts `media-data` read-only at `/data` (same path as qBittorrent) so autom
 - Orphan scan (files in qBittorrent save paths not owned by any torrent) runs daily in preview mode only (`autoCleanupEnabled=false`). It does not scan the temp path `/data/torrents/incomplete`.
 - Freed space may not show in `df` right away: the NAS dataset likely keeps snapshots that hold deleted blocks until they expire.
 - To avoid orphans: cancel downloads from the Sonarr/Radarr queue (removes data), or tick "delete files" when removing a torrent in qBittorrent/qui.
+
+## Jellyfin Hardware Transcoding
+
+Jellyfin runs on `mandy` with the GTX 1050 (`runtimeClassName: nvidia`, `nvidia.com/gpu: 1`). The GPU is only used if Jellyfin's own setting says so (Dashboard → Playback → Transcoding, stored in the config PVC, not in this repo):
+
+- Hardware acceleration: **NVENC**; decode h264, hevc (10-bit on), mpeg2video, vc1, vp9. No AV1 decode on Pascal (Sonarr/Radarr profiles penalize AV1 anyway).
+- Tone mapping, throttling and segment deletion enabled.
+- Check: during a transcode, `kubectl -n media exec deploy/jellyfin -- nvidia-smi` shows encoder/decoder usage, and the newest `/config/log/FFmpeg.Transcode-*` contains `-hwaccel cuda` and `h264_nvenc`.
+
+API note: Jellyfin 12 rejects `X-Emby-Token`; use `Authorization: MediaBrowser Token="<key>"`.
