@@ -1,7 +1,7 @@
 image:
   repository: ghcr.io/halcyon-video/halcyon-video
   pullPolicy: IfNotPresent
-  tag: "0.30.1"
+  tag: "0.30.2"
 
 containerPort: 1420
 
