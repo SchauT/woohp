@@ -19,22 +19,25 @@ persistence:
     size: 10Gi
 
 service:
-  type: ClusterIP
+  # NodePort: LAN clients (Apple TV) stream directly at http://192.168.1.104:30096
+  # instead of going through the public ingress. Remote access: https://watch.schaut.fr (traefik).
+  type: NodePort
   port: 8096
+  nodePort: 30096
 
 ingress:
   enabled: true
-  className: tailscale
+  className: traefik
   annotations:
-    tailscale.com/funnel: "true"
+    cert-manager.io/cluster-issuer: letsencrypt
   hosts:
-    - host: jellyfin
+    - host: watch.schaut.fr
       paths:
         - path: /
           pathType: Prefix
   tls:
     - hosts:
-        - jellyfin
+        - watch.schaut.fr
       secretName: jellyfin-tls
 
 resources:

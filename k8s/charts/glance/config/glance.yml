@@ -79,7 +79,7 @@ pages:
                 allow-insecure: true
                 icon: si:truenas
               - title: Jellyfin
-                url: https://jellyfin.raccoon-pence.ts.net/
+                url: https://watch.schaut.fr/
                 check-url: http://jellyfin.media.svc.woohp.local:8096
                 icon: si:jellyfin
               - title: Sonarr

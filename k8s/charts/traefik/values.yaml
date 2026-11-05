@@ -1,0 +1,15 @@
+traefik:
+  ingressClass:
+    # tailscale stays the class for private apps; only ingresses asking for traefik go public
+    isDefaultClass: false
+  # No LoadBalancer on bare metal: the home router forwards WAN 80/443 to the
+  # Talos VIP 192.168.1.100:30080/30443 (HA across control planes). Requires
+  # kube-proxy nodePortAddresses covering the VIP, see talos/talconfig.yaml
+  service:
+    spec:
+      type: NodePort
+  ports:
+    web:
+      nodePort: 30080
+    websecure:
+      nodePort: 30443

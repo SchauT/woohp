@@ -31,6 +31,14 @@ patches:
             nodefs.inodesFree: "5%"
 controlPlane:
   patches:
+    # nftables kube-proxy only serves NodePorts on the node's primary IP by default;
+    # widen to the LAN so the VIP .100 answers too (router forwards 80/443 to VIP:30080/30443 -> traefik)
+    - |-
+      apiVersion: v1alpha1
+      kind: KubeProxyConfig
+      config:
+        nodePortAddresses:
+          - 192.168.1.0/24
     - |-
       apiVersion: v1alpha1
       kind: KubeEtcdEncryptionConfig

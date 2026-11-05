@@ -35,7 +35,7 @@ spec:
             - name: TZ
               value: {{ .Values.env.TZ | quote }}
             - name: JELLYFIN_PublishedServerUrl
-              value: "http://jellyfin"
+              value: "https://watch.schaut.fr"
           ports:
             - name: http
               containerPort: {{ .Values.containerPort }}

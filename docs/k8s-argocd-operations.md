@@ -414,6 +414,21 @@ This repo has no versioned Tailscale ACL policy (managed only in the Tailscale a
 
 Without this grant, ArgoCD sync succeeds but Funnel stays refused by policy — fail-safe, not a security gap if forgotten.
 
+## Exposing an App Publicly via Traefik + Let's Encrypt
+
+Funnel relays traffic through Tailscale and is too slow for video streaming. Bandwidth-heavy apps (Jellyfin → `https://watch.schaut.fr`) go through Traefik instead, with direct port forwarding from the home router.
+
+- `k8s/charts/traefik`: Service `NodePort` (no LoadBalancer on bare metal), `web` → `30080`, `websecure` → `30443`. Not the default IngressClass, so only ingresses that ask for `traefik` are public.
+- `k8s/charts/cert-manager`: ClusterIssuer `letsencrypt` (ACME HTTP-01 through the `traefik` class, no account email).
+- App ingress: `className: traefik`, annotation `cert-manager.io/cluster-issuer: letsencrypt`, `tls.secretName` set: cert-manager issues and renews the cert automatically.
+
+Manual steps outside the repo:
+
+- Router: forward WAN TCP `80` → `192.168.1.100:30080` and WAN TCP `443` → `192.168.1.100:30443` (Talos VIP; port 80 is required by HTTP-01). The VIP fails over between control planes (near-instant on graceful shutdown, up to ~1 min on a crash). It only works because `talconfig.yaml` sets the kube-proxy `nodePortAddresses: [192.168.1.0/24]`: by default, nftables kube-proxy only serves NodePorts on the node's primary IP, so the VIP would not answer. That `KubeProxyConfig` change reaches the DaemonSet through `talosctl upgrade-k8s --to <current version>` (bootstrap manifests sync), not through `apply-config` alone.
+- Cloudflare (`schaut.fr` zone): set an `A` record for the host pointing to the home public IP, **DNS only (grey cloud)**. Cloudflare's proxy is not meant for video streaming and adds latency.
+
+Validate: `kubectl get certificate -A` shows `READY=True`, and `curl -sI https://<host>` answers with a valid cert.
+
 ## Chart and Repo Conventions
 
 - Helm dependency archives (`*.tgz`) are not tracked.
