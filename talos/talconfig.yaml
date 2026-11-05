@@ -10,6 +10,13 @@ additionalMachineCertSans:
 patches:
   - |-
     machine:
+      sysctls:
+        # NFS has no cgroup writeback, so dirty pages are only throttled by the
+        # global limit (default 20% of RAM, ≈3.4G on mandy). Fast qBittorrent
+        # downloads to the NAS filled its 3Gi memcg with dirty pages → OOMKill.
+        # Absolute caps below any NFS writer's memory limit throttle the writer instead.
+        vm.dirty_background_bytes: 268435456 # 256Mi
+        vm.dirty_bytes: 1073741824 # 1Gi
       kubelet:
         extraMounts:
           - destination: /var/lib/longhorn

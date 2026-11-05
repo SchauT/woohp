@@ -32,4 +32,6 @@ resources:
     memory: 64Mi
   limits:
     cpu: 200m
-    memory: 256Mi
+    # Must exceed node vm.dirty_bytes (1Gi): NFS dirty pages from extraction count
+    # against this memcg and can't be reclaimed until written → OOMKill. See AGENTS.md.
+    memory: 1536Mi
