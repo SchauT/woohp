@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: glanceapp/glance
   pullPolicy: IfNotPresent
-  tag: "v0.8.7"
+  tag: "v0.8.8"
 containerPort: 8080
 
 serviceAccount:
