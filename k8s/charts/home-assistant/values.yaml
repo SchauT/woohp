@@ -1,0 +1,47 @@
+image:
+  repository: ghcr.io/home-assistant/home-assistant
+  pullPolicy: IfNotPresent
+  tag: "2026.11.2"
+
+containerPort: 8123
+
+# Node the Zigbee dongle is physically plugged into.
+nodeName: mandy
+
+env:
+  TZ: "Europe/Paris"
+
+# Trusted by HA's http integration so it accepts X-Forwarded-For from the ingress proxy.
+# Talos default pod CIDR (podSubnets not overridden in talconfig.yaml).
+trustedProxies:
+  - 10.244.0.0/16
+
+persistence:
+  config:
+    storageClass: longhorn
+    size: 5Gi
+
+service:
+  type: ClusterIP
+  port: 8123
+
+ingress:
+  enabled: true
+  className: tailscale
+  hosts:
+    - host: home-assistant
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - home-assistant
+      secretName: home-assistant-tls
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: "2"
+    memory: 1Gi

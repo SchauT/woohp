@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "home-assistant.fullname" . }}
+  labels:
+    {{- include "home-assistant.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "home-assistant.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "home-assistant.labels" . | nindent 8 }}
+    spec:
+      enableServiceLinks: false
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.nodeName }}
+      initContainers:
+        # Seed configuration.yaml (same content HA writes on first boot) and make sure
+        # the http block trusts the ingress proxy, otherwise HA answers 400 behind it.
+        - name: init-config
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              cd /config
+              if [ ! -f configuration.yaml ]; then
+                printf 'default_config:\n\nfrontend:\n  themes: !include_dir_merge_named themes\n\nautomation: !include automations.yaml\nscript: !include scripts.yaml\nscene: !include scenes.yaml\n' > configuration.yaml
+                echo '[]' > automations.yaml
+                touch scripts.yaml scenes.yaml
+              fi
+              if ! grep -q '^http:' configuration.yaml; then
+                printf '\nhttp:\n  use_x_forwarded_for: true\n  trusted_proxies:\n' >> configuration.yaml
+                {{- range .Values.trustedProxies }}
+                printf '    - %s\n' {{ . | quote }} >> configuration.yaml
+                {{- end }}
+              fi
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      containers:
+        - name: home-assistant
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            # Needed to open the USB serial device of the Zigbee dongle.
+            privileged: true
+          env:
+            - name: TZ
+              value: {{ .Values.env.TZ | quote }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 15
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: serial
+              mountPath: /dev/serial
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ include "home-assistant.fullname" . }}-config
+        # ponytail: whole /dev/serial dir instead of one by-id path, so the chart does not
+        # need the dongle serial. Privileged gives the container the host /dev/ttyUSB* node
+        # the by-id symlink points to, but only those present at container start:
+        # plug the dongle before the pod starts (or delete the pod after replugging).
+        - name: serial
+          hostPath:
+            path: /dev/serial
+            type: DirectoryOrCreate

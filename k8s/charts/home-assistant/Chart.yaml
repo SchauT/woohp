@@ -1,0 +1,6 @@
+apiVersion: v2
+name: home-assistant
+description: Home Assistant with ZHA (Sonoff Zigbee 3.0 USB Dongle Plus P on mandy)
+type: application
+version: 1.0.0
+appVersion: "2026.11.2"
