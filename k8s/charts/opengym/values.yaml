@@ -9,9 +9,10 @@ api:
     RP_ID: "opengym.raccoon-pence.ts.net"
     ORIGIN: "https://opengym.raccoon-pence.ts.net"
     DEFAULT_LANG: "fr"
-    # First profile created on the empty instance becomes admin; others need an invite.
+    # First profile created on the empty instance becomes admin.
+    # ponytail: no INVITE_ONLY, it blocks the very first signup (no admin yet to issue a code)
+    # and the tailnet already limits who can reach the app.
     FIRST_USER_ADMIN: "1"
-    INVITE_ONLY: "1"
   resources:
     requests:
       cpu: 50m
