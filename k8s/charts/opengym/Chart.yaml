@@ -1,0 +1,6 @@
+apiVersion: v2
+name: opengym
+description: openGym self-hosted workout tracker and planner
+type: application
+version: 1.0.0
+appVersion: "1.4.5"

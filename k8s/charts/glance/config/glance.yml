@@ -130,6 +130,10 @@ pages:
                 url: https://home-assistant.raccoon-pence.ts.net/
                 check-url: http://home-assistant.home-assistant.svc.woohp.local:8123
                 icon: si:homeassistant
+              - title: openGym
+                url: https://opengym.raccoon-pence.ts.net/
+                check-url: http://opengym.opengym.svc.woohp.local
+                icon: mdi:dumbbell
               - title: Halcyon Video
                 url: https://store.raccoon-pence.ts.net/
                 check-url: http://halcyon-video.media.svc.woohp.local:1420

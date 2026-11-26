@@ -1,0 +1,53 @@
+# API and web images of one release belong together: bump both tags at once.
+api:
+  image:
+    repository: ghcr.io/duartesantos8/opengym-api
+    tag: "1.4.5"
+  # Every other setting from upstream .env.example goes here.
+  env:
+    TZ: "Europe/Paris"
+    RP_ID: "opengym.raccoon-pence.ts.net"
+    ORIGIN: "https://opengym.raccoon-pence.ts.net"
+    DEFAULT_LANG: "fr"
+    # First profile created on the empty instance becomes admin; others need an invite.
+    FIRST_USER_ADMIN: "1"
+    INVITE_ONLY: "1"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+
+web:
+  image:
+    repository: ghcr.io/duartesantos8/opengym-web
+    tag: "1.4.5"
+  resources:
+    requests:
+      cpu: 20m
+      memory: 32Mi
+    limits:
+      memory: 128Mi
+
+persistence:
+  data:
+    storageClass: longhorn
+    size: 2Gi
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: tailscale
+  hosts:
+    - host: opengym
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - opengym
+      secretName: opengym-tls
